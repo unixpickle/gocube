@@ -15,7 +15,7 @@ var CornerIndexes = []int{
 	53, 9, 24,
 	42, 11, 26,
 	47, 6, 18,
-	36, 20, 8,
+	36, 8, 20,
 }
 
 // CornerPieces contains 8 sets of 3 values which correspond to the x, y, and
@@ -80,13 +80,29 @@ func (c *CubieCube) StickerCube() StickerCube {
 		res[EdgeIndexes[destIdx]] = s1
 		res[EdgeIndexes[destIdx+1]] = s2
 	}
-	
+
 	// Insert the corner pieces.
 	for i, piece := range c.Corners {
 		idx := piece.Piece * 3
 		s1, s2, s3 := CornerPieces[idx], CornerPieces[idx+1],
 			CornerPieces[idx+2]
-		// TODO: here, figure out how to reorder these numbers...
+		
+		// Transform corner piece to move to its current position.
+		// If an odd number of quarter turns were needed to move it to this
+		// position, the corner's permutation is in the odd-parity coset.
+		difference := (piece.Piece ^ i) & 7
+		if difference == 1 || difference == 2 || difference == 4 ||
+			difference == 7 {
+			s2, s3 = s3, s2
+		}
+		
+		// Twist the corner piece
+		if piece.Orientation == 1 {
+			s1, s2, s3 = s3, s1, s2
+		} else if piece.Orientation == 2 {
+			s1, s2, s3 = s2, s3, s1
+		}
+		
 		destIdx := i * 3
 		res[CornerIndexes[destIdx]] = s1
 		res[CornerIndexes[destIdx+1]] = s2

@@ -4,6 +4,21 @@ import (
 	"testing"
 )
 
+func TestCubieToSticker(t *testing.T) {
+	// Run algorithm for comparison
+	cubie := SolvedCubieCube()
+	moves, _ := ParseMoves("B U D B' L2 D' R' F2 L F D2 R2 F' U2 R B2 L' U'")
+	for _, move := range moves {
+		cubie.Move(move)
+	}
+	
+	stickers := cubie.StickerCube()
+	str := "OGBYWWOOY OWOGYGGBR WBBGGOBRB RWYYBRWYR RBWWROWYG GRGBORYOY"
+	if stickers.String() != str {
+		t.Error("Invalid stickers:", stickers.String())
+	}
+}
+
 func TestStickerToCubieIdentity(t *testing.T) {
 	stickers, err := ParseStickerCube("111111111 222222222 333333333 " + 
 		"444444444 555555555 666666666")
@@ -62,20 +77,5 @@ func TestStickerToCube(t *testing.T) {
 		if x.Piece != e.Piece || x.Flip != e.Flip {
 			t.Error("Invalid edge at index", i)
 		}
-	}
-}
-
-func TestCubieToSticker(t *testing.T) {
-	// Run algorithm for comparison
-	cubie := SolvedCubieCube()
-	moves, _ := ParseMoves("B U D B' L2 D' R' F2 L F D2 R2 F' U2 R B2 L' U'")
-	for _, move := range moves {
-		cubie.Move(move)
-	}
-	
-	stickers := cubie.StickerCube()
-	str := "OGBYWWOOY OWOGYGGBR WBBGGOBRB RWYYBRWYR RBWWROWYG GRGBORYOY"
-	if stickers.String() != str {
-		t.Error("Invalid stickers:", stickers.String())
 	}
 }
