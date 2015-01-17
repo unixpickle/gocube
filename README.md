@@ -1,6 +1,6 @@
 # gocube
 
-**cube** will be a pure Go library for solving the 3x3x3 Rubik's cube and various parts of it.
+**gocube** will be a pure Go library for solving the 3x3x3 Rubik's cube and various parts of it.
 
 # Design considerations
 
