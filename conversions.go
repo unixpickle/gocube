@@ -6,7 +6,7 @@ import (
 )
 
 // CornerIndexes contains 8 sets of 3 values which corresponds to the x, y, and
-// z stickers for each corner piece.
+// z sticker indexes for each corner piece.
 var CornerIndexes = []int{
 	51, 15, 35,
 	44, 17, 33,
@@ -18,8 +18,22 @@ var CornerIndexes = []int{
 	36, 20, 8,
 }
 
-// EdgeIndexes contains 12 pairs of values which correspond to the stickers of
-// each edge.
+// CornerPieces contains 8 sets of 3 values which correspond to the x, y, and
+// z stickers for each corner piece.
+var CornerPieces = []int{
+	6, 2, 4,
+	5, 2, 4,
+	6, 1, 4,
+	5, 1, 4,
+	6, 2, 3,
+	5, 2, 3,
+	6, 1, 3,
+	5, 1, 3,
+	
+}
+
+// EdgeIndexes contains 12 pairs of values which correspond to the sticker
+// indexes of each edge.
 var EdgeIndexes = []int{
 	7, 19,
 	23, 39,
@@ -33,6 +47,23 @@ var EdgeIndexes = []int{
 	32, 48,
 	12, 52,
 	14, 43,
+}
+
+// EdgePieces contains 12 pairs of values which correspond to the stickers of
+// each edge.
+var EdgePieces = []int{
+	1, 3,
+	3, 5,
+	2, 3,
+	3, 6,
+	1, 6,
+	1, 5,
+	1, 4,
+	4, 5,
+	2, 4,
+	4, 6,
+	2, 6,
+	2, 5,
 }
 
 // CubieToSticker converts a CubieCube to a StickerCube
@@ -78,7 +109,7 @@ func StickerToCubie(s StickerCube) (*CubieCube, error) {
 func findCorner(stickers [3]int) (idx int, orientation int, err error) {
 	for i := 0; i < 8; i++ {
 		start := i * 3
-		if !setsEqual(stickers[:], CornerIndexes[start:start+3]) {
+		if !setsEqual(stickers[:], CornerPieces[start:start+3]) {
 			continue
 		}
 		orientation = listIndex(stickers[:], 5)
@@ -96,7 +127,7 @@ func findCorner(stickers [3]int) (idx int, orientation int, err error) {
 func findEdge(stickers [2]int) (idx int, flip bool, err error) {
 	for i := 0; i < 12; i++ {
 		start := i * 2
-		if !setsEqual(stickers[:], EdgeIndexes[start:start+2]) {
+		if !setsEqual(stickers[:], EdgePieces[start:start+2]) {
 			continue
 		}
 

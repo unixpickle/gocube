@@ -169,6 +169,11 @@ type CubieCube struct {
 	Edges   CubieEdges
 }
 
+// SolvedCubieCube returns a solved CubieCube
+func SolvedCubieCube() CubieCube {
+	return CubieCube{SolvedCubieCorners(), SolvedCubieEdges()}
+}
+
 // HalfTurn applies a half-turn to the edges and corners.
 func (c *CubieCube) HalfTurn(face int) {
 	c.Corners.HalfTurn(face)
