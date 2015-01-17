@@ -160,6 +160,24 @@ type CubieCube struct {
 	Edges   CubieEdges
 }
 
+// HalfTurn applies a half-turn to the edges and corners.
+func (c *CubieCube) HalfTurn(face int) {
+	c.Corners.HalfTurn(face)
+	c.Edges.HalfTurn(face)
+}
+
+// Move applies a move to the edges and corners.
+func (c *CubieCube) Move(m Move) {
+	c.Corners.Move(m)
+	c.Edges.Move(m)
+}
+
+// QuarterTurn applies a quarter-turn to the edges and corners.
+func (c *CubieCube) QuarterTurn(face, turns int) {
+	c.Corners.QuarterTurn(face, turns)
+	c.Edges.QuarterTurn(face, turns)
+}
+
 // A CubieEdge represents a physical edge of a cube.
 // Edges are indexed from 0 through 11 in the following order:
 // UF, RF, DF, LF, UL, UR, BU, BR, BD, BL, DL, DR.
