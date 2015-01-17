@@ -29,6 +29,15 @@ type CubieCorner struct {
 // CubieCorners represents the corners of a cube.
 type CubieCorners [8]CubieCorner
 
+// SolvedCubieCorners generates the corners of a solved cube.
+func SolvedCubieCorners() CubieCorners {
+	var res CubieCorners
+	for i := 0; i < 8; i++ {
+		res[i].Piece = i
+	}
+	return res
+}
+
 // HalfTurn performs a 180 degree turn on a given face.
 func (c *CubieCorners) HalfTurn(face int) {
 	// A double turn is really just two swaps.
@@ -46,7 +55,7 @@ func (c *CubieCorners) HalfTurn(face int) {
 		c[0], c[3] = c[3], c[0]
 		c[1], c[2] = c[2], c[1]
 	case 5: // Right face
-		c[4], c[7] = c[7], c[4]
+		c[1], c[7] = c[7], c[1]
 		c[3], c[5] = c[5], c[3]
 	case 6: // Left face
 		c[0], c[6] = c[6], c[0]
