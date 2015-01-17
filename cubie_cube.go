@@ -191,6 +191,15 @@ type CubieEdge struct {
 // CubieEdges represents the edges of a cube.
 type CubieEdges [12]CubieEdge
 
+// SolvedCubieEdges returns CubieEdges in their solved state.
+func SolvedCubieEdges() CubieEdges {
+	var res CubieEdges
+	for i := 0; i < 12; i++ {
+		res[i].Piece = i
+	}
+	return res
+}
+
 // HalfTurn performs a 180 degree turn on a given face.
 func (c *CubieEdges) HalfTurn(face int) {
 	// Every half-turn is really just two swaps.
@@ -248,7 +257,7 @@ func (c *CubieEdges) QuarterTurn(face, turns int) {
 		if turns == 1 {
 			c[0], c[1], c[2], c[3] = c[3], c[0], c[1], c[2]
 		} else {
-			c[0], c[1], c[2], c[3] = c[3], c[0], c[1], c[2]
+			c[3], c[0], c[1], c[2] = c[0], c[1], c[2], c[3]
 		}
 		// Flip edges
 		for i := 0; i < 4; i++ {
