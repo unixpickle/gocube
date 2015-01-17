@@ -1,7 +1,6 @@
 package gocube
 
 import (
-	"errors"
 	"strconv"
 )
 
@@ -68,6 +67,7 @@ func (c *CubieCorners) Move(m Move) {
 	}
 }
 
+// QuarterTurn performs a 90 degree turn on a given face.
 func (c *CubieCorners) QuarterTurn(face, turns int) {
 	// This code is not particularly graceful, but it is rather efficient and
 	// quite readable compared to a pure array of transformations.
@@ -160,11 +160,6 @@ type CubieCube struct {
 	Edges   CubieEdges
 }
 
-// StickerToCubie converts a StickerCube to a CubieCube.
-func StickerToCubie(c StickerCube) (*CubieCube, error) {
-	return nil, errors.New("NYI")
-}
-
 // A CubieEdge represents a physical edge of a cube.
 // Edges are indexed from 0 through 11 in the following order:
 // UF, RF, DF, LF, UL, UR, BU, BR, BD, BL, DL, DR.
@@ -178,7 +173,93 @@ type CubieEdge struct {
 // CubieEdges represents the edges of a cube.
 type CubieEdges [12]CubieEdge
 
+// HalfTurn performs a 180 degree turn on a given face.
+func (c *CubieEdges) HalfTurn(face int) {
+	// Every half-turn is really just two swaps.
+	switch face {
+	case 1: // Top face
+		c[0], c[6] = c[6], c[0]
+		c[4], c[5] = c[5], c[4]
+	case 2: // Bottom face
+		c[2], c[8] = c[8], c[2]
+		c[10], c[11] = c[11], c[10]
+	case 3: // Front face
+		c[0], c[2] = c[2], c[0]
+		c[1], c[3] = c[3], c[1]
+	case 4: // Back face
+		c[6], c[8] = c[8], c[6]
+		c[7], c[9] = c[9], c[7]
+	case 5: // Right face
+		c[1], c[7] = c[7], c[1]
+		c[5], c[11] = c[11], c[5]
+	case 6: // Left face
+		c[3], c[9] = c[9], c[3]
+		c[4], c[10] = c[10], c[4]
+	default:
+		panic("Unsupported half-turn applied to CubieEdges: " +
+			strconv.Itoa(face))
+	}
+}
+
 // Move applies a face turn to the edges.
 func (c *CubieEdges) Move(m Move) {
-	// TODO: this
+	// Half turns are a simple case.
+	if m.Turns == 2 {
+		c.HalfTurn(m.Face)
+	} else {
+		c.QuarterTurn(m.Face, m.Turns)
+	}
+}
+
+// QuarterTurn performs a 90 degree turn on a given face.
+func (c *CubieEdges) QuarterTurn(face, turns int) {
+	switch face {
+	case 1: // Top face
+		if turns == 1 {
+			c[0], c[4], c[6], c[5] = c[5], c[0], c[4], c[6]
+		} else {
+			c[5], c[0], c[4], c[6] = c[0], c[4], c[6], c[5]
+		}
+	case 2: // Bottom face
+		if turns == 1 {
+			c[2], c[11], c[8], c[10] = c[10], c[2], c[11], c[8]
+		} else {
+			c[10], c[2], c[11], c[8] = c[2], c[11], c[8], c[10]
+		}
+	case 3: // Front face
+		if turns == 1 {
+			c[0], c[1], c[2], c[3] = c[3], c[0], c[1], c[2]
+		} else {
+			c[0], c[1], c[2], c[3] = c[3], c[0], c[1], c[2]
+		}
+		// Flip edges
+		for i := 0; i < 4; i++ {
+			c[i].Flip = !c[i].Flip
+		}
+	case 4: // Back face
+		if turns == 1 {
+			c[6], c[9], c[8], c[7] = c[7], c[6], c[9], c[8]
+		} else {
+			c[7], c[6], c[9], c[8] = c[6], c[9], c[8], c[7]
+		}
+		// Flip edges
+		for i := 6; i < 10; i++ {
+			c[i].Flip = !c[i].Flip
+		}
+	case 5: // Right face
+		if turns == 1 {
+			c[1], c[5], c[7], c[11] = c[11], c[1], c[5], c[7]
+		} else {
+			c[11], c[1], c[5], c[7] = c[1], c[5], c[7], c[11]
+		}
+	case 6: // Left face
+		if turns == 1 {
+			c[3], c[10], c[9], c[4] = c[4], c[3], c[10], c[9]
+		} else {
+			c[4], c[3], c[10], c[9] = c[3], c[10], c[9], c[4]
+		}
+	default:
+		panic("Unsupported quarter-turn applied to CubieEdges: " +
+			strconv.Itoa(face))
+	}
 }
