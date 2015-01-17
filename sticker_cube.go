@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // A StickerCube is simply a list of 54 stickers.
@@ -37,7 +38,7 @@ type StickerCube [54]int
 
 // InputStickerCube reads user input for a sticker cube.
 // The cube is not validated beyond checking that each sticker occurs 9 times.
-func (s StickerCube) InputStickerCube() (*StickerCube, error) {
+func InputStickerCube() (*StickerCube, error) {
 	// Print out some helpful information.
 	fmt.Println("Enter a cube. Color codes (if it helps):")
 	fmt.Println(" 1=W=white, 2=Y=yellow, 3=G=green, 4=B=blue,",
@@ -82,19 +83,47 @@ func (s StickerCube) InputStickerCube() (*StickerCube, error) {
 	return &res, nil
 }
 
-func readFace(number int) ([]int, error) {
-	// Read the line
-	var line string
-	if _, err := fmt.Scanln(&line); err != nil {
-		return nil, err
-	}
-	runes := []rune(line)
-	if len(runes) > 9 {
-		return nil, errors.New("Face input was too long.")
+// ParseStickerCube parses a space-delimited list of faces.
+func ParseStickerCube(str string) (*StickerCube, error) {
+	faceStrs := strings.Split(str, " ")
+	if len(faceStrs) != 6 {
+		return nil, errors.New("Input must have six faces.")
 	}
 
-	// Process each character in the line
+	var res StickerCube
+	for i, faceStr := range faceStrs {
+		list, err := parseFace(faceStr, i+1)
+		if err != nil {
+			return nil, err
+		}
+		copy(res[i*9:i*9+9], list)
+	}
+	return &res, nil
+}
+
+// String generates a space-delimited list of faces in human-readable form.
+func (s *StickerCube) String() string {
+	res := ""
+	for i := 0; i < 54; i++ {
+		if i%9 == 0 && i != 0 {
+			res += " "
+		}
+		num := s[i]
+		strs := " WYGBRO"
+		res += strs[num : num+1]
+	}
+	return res
+}
+
+func parseFace(str string, fill int) ([]int, error) {
+	runes := []rune(str)
+	if len(runes) > 9 {
+		return nil, errors.New("Face string cannot exceed nine characters.")
+	}
+
 	res := make([]int, 9)
+
+	// Read each character of their input.
 	for i, c := range runes {
 		if c == '1' || c == 'W' {
 			res[i] = 1
@@ -112,8 +141,20 @@ func readFace(number int) ([]int, error) {
 			return nil, errors.New("Unexpected character: " + string(c))
 		}
 	}
+
+	// If they left out the ending, we fill it in with the face number.
 	for i := len(runes); i < 9; i++ {
-		res[i] = number
+		res[i] = fill
 	}
+
 	return res, nil
+}
+
+func readFace(number int) ([]int, error) {
+	// Read the line
+	var line string
+	if _, err := fmt.Scanln(&line); err != nil {
+		return nil, err
+	}
+	return parseFace(line, number)
 }
