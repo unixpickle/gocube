@@ -14,6 +14,26 @@ func BenchmarkCubieMove(b *testing.B) {
 	}
 }
 
+func BenchmarkCubieCornersMove(b *testing.B) {
+	moves, _ := ParseMoves("B U D B' L2 D' R' F2 L F D2 R2 F' U2 R B2 L' U'")
+	corners := SolvedCubieCorners()
+	for i := 0; i < b.N/len(moves); i++ {
+		for _, move := range moves {
+			corners.Move(move)
+		}
+	}
+}
+
+func BenchmarkCubieEdgesMove(b *testing.B) {
+	moves, _ := ParseMoves("B U D B' L2 D' R' F2 L F D2 R2 F' U2 R B2 L' U'")
+	edges := SolvedCubieEdges()
+	for i := 0; i < b.N/len(moves); i++ {
+		for _, move := range moves {
+			edges.Move(move)
+		}
+	}
+}
+
 func TestCubieCorners(t *testing.T) {
 	corners := SolvedCubieCorners()
 	
