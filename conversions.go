@@ -29,7 +29,6 @@ var CornerPieces = []int{
 	5, 2, 3,
 	6, 1, 3,
 	5, 1, 3,
-	
 }
 
 // EdgeIndexes contains 12 pairs of values which correspond to the sticker
@@ -66,15 +65,39 @@ var EdgePieces = []int{
 	2, 5,
 }
 
-// CubieToSticker converts a CubieCube to a StickerCube
-func CubieToSticker(c CubieCube) StickerCube {
-	var res StickerCube
-	// TODO: this
+// StickerCube converts a CubieCube to a StickerCube
+func (c *CubieCube) StickerCube() StickerCube {
+	res := SolvedStickerCube()
+
+	// Insert the edge pieces.
+	for i, piece := range c.Edges {
+		pieceIdx := piece.Piece * 2
+		s1, s2 := EdgePieces[pieceIdx], EdgePieces[pieceIdx+1]
+		if piece.Flip {
+			s1, s2 = s2, s1
+		}
+		destIdx := i * 2
+		res[EdgeIndexes[destIdx]] = s1
+		res[EdgeIndexes[destIdx+1]] = s2
+	}
+	
+	// Insert the corner pieces.
+	for i, piece := range c.Corners {
+		idx := piece.Piece * 3
+		s1, s2, s3 := CornerPieces[idx], CornerPieces[idx+1],
+			CornerPieces[idx+2]
+		// TODO: here, figure out how to reorder these numbers...
+		destIdx := i * 3
+		res[CornerIndexes[destIdx]] = s1
+		res[CornerIndexes[destIdx+1]] = s2
+		res[CornerIndexes[destIdx+2]] = s3
+	}
+
 	return res
 }
 
-// StickerToCubie converts a StickerCube to a CubieCube.
-func StickerToCubie(s StickerCube) (*CubieCube, error) {
+// CubieCube converts a StickerCube to a CubieCube.
+func (s *StickerCube) CubieCube() (*CubieCube, error) {
 	var result CubieCube
 
 	// Translate corner pieces.

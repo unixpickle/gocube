@@ -101,6 +101,15 @@ func ParseStickerCube(str string) (*StickerCube, error) {
 	return &res, nil
 }
 
+// SolvedStickerCube returns a solved sticker cube.
+func SolvedStickerCube() StickerCube {
+	var result StickerCube
+	for i := 0; i < 54; i++ {
+		result[i] = i/9 + 1
+	}
+	return result
+}
+
 // String generates a space-delimited list of faces in human-readable form.
 func (s *StickerCube) String() string {
 	res := ""
