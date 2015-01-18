@@ -52,3 +52,17 @@ func ParseMoves(movesString string) ([]Move, error) {
 	}
 	return res, nil
 }
+
+// String converts a move to a WCA-notation string.
+func (m Move) String() string {
+	letter := string(" UDFBRL"[m.Face])
+	if m.Turns == 1 {
+		return letter
+	} else if m.Turns == -1 {
+		return letter + "'"
+	} else if m.Turns == 2 {
+		return letter + "2"
+	} else {
+		return ""
+	}
+}

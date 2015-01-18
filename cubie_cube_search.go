@@ -101,7 +101,7 @@ func (s *CubieCubeSearch) distSearch(st CubieCube, max int, d int) []Move {
 		wg.Add(1)
 		newState := st
 		newState.Move(move)
-		go func() {
+		go func(m Move) {
 			var res []Move
 			if d == 1 {
 				res = s.regularSearch(newState, max-1)
@@ -110,12 +110,12 @@ func (s *CubieCubeSearch) distSearch(st CubieCube, max int, d int) []Move {
 			}
 			if res != nil {
 				solutionLock.Lock()
-				solution = res
+				solution = append([]Move{m}, res...)
 				solutionLock.Unlock()
 				s.Cancel()
 			}
 			wg.Done()
-		}()
+		}(move)
 	}
 
 	wg.Wait()

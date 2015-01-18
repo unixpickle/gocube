@@ -163,6 +163,16 @@ func (c *CubieCorners) QuarterTurn(face, turns int) {
 	}
 }
 
+// Solved returns true if all the corners are properly positioned and oriented.
+func (c *CubieCorners) Solved() bool {
+	for i := 0; i < 8; i++ {
+		if c[i].Piece != i || c[i].Orientation != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 // A CubieCube represents a cube's physical construction.
 type CubieCube struct {
 	Corners CubieCorners
@@ -190,6 +200,11 @@ func (c *CubieCube) Move(m Move) {
 func (c *CubieCube) QuarterTurn(face, turns int) {
 	c.Corners.QuarterTurn(face, turns)
 	c.Edges.QuarterTurn(face, turns)
+}
+
+// Solved returns true if the edges and corners are solved.
+func (c *CubieCube) Solved() bool {
+	return c.Corners.Solved() && c.Edges.Solved()
 }
 
 // A CubieEdge represents a physical edge of a cube.
@@ -303,4 +318,14 @@ func (c *CubieEdges) QuarterTurn(face, turns int) {
 		panic("Unsupported quarter-turn applied to CubieEdges: " +
 			strconv.Itoa(face))
 	}
+}
+
+// Solved returns true if all the edges are properly positioned and oriented.
+func (c *CubieEdges) Solved() bool {
+	for i := 0; i < 12; i++ {
+		if c[i].Piece != i || c[i].Flip {
+			return false
+		}
+	}
+	return true
 }
