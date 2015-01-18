@@ -4,6 +4,30 @@ import (
 	"testing"
 )
 
+func BenchmarkCubieToSticker(b *testing.B) {
+	// Run algorithm to generate a cubie cube
+	cubie := SolvedCubieCube()
+	moves, _ := ParseMoves("B U D B' L2 D' R' F2 L F D2 R2 F' U2 R B2 L' U'")
+	for _, move := range moves {
+		cubie.Move(move)
+	}
+	
+	// Convert it to a sticker cube N times.
+	for i := 0; i < b.N; i++ {
+		cubie.StickerCube()
+	}
+}
+
+func BenchmarkStickerToCubie(b *testing.B) {
+	stickers, _ := ParseStickerCube("OGBYWWOOY OWOGYGGBR WBBGGOBRB " +
+		"RWYYBRWYR RBWWROWYG GRGBORYOY")
+	
+	// Convert it to a sticker cube N times.
+	for i := 0; i < b.N; i++ {
+		stickers.CubieCube()
+	}
+}
+
 func TestCubieToSticker(t *testing.T) {
 	// Run algorithm for comparison
 	cubie := SolvedCubieCube()
