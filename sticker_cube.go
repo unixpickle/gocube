@@ -21,19 +21,24 @@ import (
 // entry as I describe below, you will always type colors from left to right,
 // top to bottom as if you were reading a book:
 //
-// * First, hold the cube so that the side you wish to be in front is in front,
-//   and the side you wish to be on top is on top. Now perform an x' so that the
-//   top side is in the front and enter the (now) front side by reading the top
-//   left color, then the one to its right, then the one to its right, then the
-//   far left sticker on the second row, etc. This is the same way you would
-//   read a book.
-// * Now perform an x2 so that the original bottom side is now in the front.
-//   Enter this side the same way as above.
-// * Now do an x' to reset the orientation of the cube, and type the front side
-//   the same way as you entered the other two.
-// * Now do a y2 and enter the back side the same way as the other three sides.
-// * Now do a y' so that the original right side is in front, and enter it in.
-// * Now do a y2 and enter the original left side.
+// 1. First, hold the cube so that the side you wish to be in front is in front,
+// and the side you wish to be on top is on top. Now perform an x' so that the
+// top side is in the front and enter the (now) front side by reading the top
+// left color, then the one to its right, then the one to its right, then the
+// far left sticker on the second row, etc. This is the same way you would
+// read a book.
+//
+// 2. Now perform an x2 so that the original bottom side is now in the front.
+// Enter this side the same way as above.
+//
+// 3. Now do an x' to reset the orientation of the cube, and type the front side
+// the same way as you entered the other two.
+//
+// 4. Now do a y2 and enter the back side the same way as the other three sides.
+//
+// 5. Now do a y' so that the original right side is in front, and enter it in.
+//
+// 6. Now do a y2 and enter the original left side.
 type StickerCube [54]int
 
 // InputStickerCube reads user input for a sticker cube.
