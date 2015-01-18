@@ -24,7 +24,7 @@ type CubieCubeSearch struct {
 	goal      CubieCubeGoal
 	heuristic CubieCubeHeuristic
 	moves     []Move
-	
+
 	lock      sync.RWMutex
 	cancelled bool
 	running   bool
@@ -62,14 +62,14 @@ func (s *CubieCubeSearch) Run(maxDepth int, distribute int) ([]Move, error) {
 	s.running = true
 	s.cancelled = false
 	s.lock.Unlock()
-	
+
 	res := s.search(maxDepth, distribute)
-	
+
 	// Reset the running flag so another search can run.
 	s.lock.Lock()
 	s.running = false
 	s.lock.Unlock()
-	
+
 	// Return the appropriate value and error.
 	if res != nil {
 		return res, nil
@@ -86,13 +86,13 @@ func (s *CubieCubeSearch) distSearch(st CubieCube, max int, d int) []Move {
 		}
 		return nil
 	}
-	
+
 	// Prune the state
 	pruneVal := s.heuristic.MinMoves(st)
 	if pruneVal > max {
 		return nil
 	}
-	
+
 	// Run each search on a different goroutine
 	wg := sync.WaitGroup{}
 	solutionLock := sync.Mutex{}
@@ -117,7 +117,7 @@ func (s *CubieCubeSearch) distSearch(st CubieCube, max int, d int) []Move {
 			wg.Done()
 		}()
 	}
-	
+
 	wg.Wait()
 	return solution
 }
@@ -130,17 +130,17 @@ func (s *CubieCubeSearch) regularSearch(st CubieCube, max int) []Move {
 		}
 		return nil
 	}
-	
+
 	// Prune the state
 	pruneVal := s.heuristic.MinMoves(st)
 	if pruneVal > max {
 		return nil
 	}
-	
+
 	// Apply each move and recurse.
 	for _, move := range s.moves {
 		if max > 5 && s.shouldStop() {
-			return nil			
+			return nil
 		}
 		newState := st
 		newState.Move(move)
@@ -148,7 +148,7 @@ func (s *CubieCubeSearch) regularSearch(st CubieCube, max int) []Move {
 			return append([]Move{move}, res...)
 		}
 	}
-	
+
 	return nil
 }
 
