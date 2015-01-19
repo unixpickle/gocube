@@ -1,47 +1,34 @@
-package gocube
+package cubiesearch
 
 import (
-	"errors"
+	"github.com/unixpickle/gocube"
 	"sync"
 )
 
-var (
-	ErrAlreadySearching = errors.New("Already searching.")
-	ErrNoSolution       = errors.New("No solution was found.")
-)
-
-type CubieCubeGoal interface {
-	IsGoal(state CubieCube) bool
-}
-
-type CubieCubeHeuristic interface {
-	MinMoves(state CubieCube) int
-}
-
-// A CubieCubeSearch can perform a cancellable depth-first search.
-type CubieCubeSearch struct {
-	start     CubieCube
-	goal      CubieCubeGoal
-	heuristic CubieCubeHeuristic
-	moves     []Move
+// A Search can perform a cancellable depth-first search.
+type Search struct {
+	start     gocube.CubieCube
+	goal      Goal
+	heuristic Heuristic
+	moves     []gocube.Move
 
 	lock      sync.RWMutex
 	cancelled bool
 	running   bool
 }
 
-// NewCubieCubeSearch creates an unstarted search with the given parameters.
-func NewCubieCubeSearch(c CubieCube, g CubieCubeGoal, h CubieCubeHeuristic,
-	m []Move) *CubieCubeSearch {
-	mCopy := make([]Move, len(m))
+// NewSearch creates an unstarted search with the given parameters.
+func NewSearch(c gocube.CubieCube, g Goal, h Heuristic,
+	m []gocube.Move) *Search {
+	mCopy := make([]gocube.Move, len(m))
 	copy(mCopy, m)
-	return &CubieCubeSearch{c, g, h, mCopy, sync.RWMutex{}, false, false}
+	return &Search{c, g, h, mCopy, sync.RWMutex{}, false, false}
 }
 
 // Cancel cancels the current search.
 // This is useful if you want to cancel the search from a different goroutine
 // than the one its running on.
-func (s *CubieCubeSearch) Cancel() {
+func (s *Search) Cancel() {
 	s.lock.Lock()
 	s.cancelled = true
 	s.lock.Unlock()
@@ -52,7 +39,7 @@ func (s *CubieCubeSearch) Cancel() {
 // ErrAlreadySearching.
 // If no solution was found either because the search was exhausted or it was
 // cancelled, ErrNoSolution is returned.
-func (s *CubieCubeSearch) Run(maxDepth int, distribute int) ([]Move, error) {
+func (s *Search) Run(maxDepth int, distribute int) ([]gocube.Move, error) {
 	// Set the flags so that no other search can be run simultaneously.
 	s.lock.Lock()
 	if s.running {
@@ -63,7 +50,13 @@ func (s *CubieCubeSearch) Run(maxDepth int, distribute int) ([]Move, error) {
 	s.cancelled = false
 	s.lock.Unlock()
 
-	res := s.search(maxDepth, distribute)
+	// Perform the search itself.
+	var res []gocube.Move
+	if distribute > 0 {
+		res = s.distSearch(s.start, maxDepth, distribute)
+	} else {
+		res = s.regularSearch(s.start, maxDepth)
+	}
 
 	// Reset the running flag so another search can run.
 	s.lock.Lock()
@@ -78,11 +71,11 @@ func (s *CubieCubeSearch) Run(maxDepth int, distribute int) ([]Move, error) {
 	}
 }
 
-func (s *CubieCubeSearch) distSearch(st CubieCube, max int, d int) []Move {
+func (s *Search) distSearch(st gocube.CubieCube, max int, d int) []gocube.Move {
 	// If we can't search any further, check if it's the goal.
 	if max == 0 {
 		if s.goal.IsGoal(st) {
-			return []Move{}
+			return []gocube.Move{}
 		}
 		return nil
 	}
@@ -96,13 +89,13 @@ func (s *CubieCubeSearch) distSearch(st CubieCube, max int, d int) []Move {
 	// Run each search on a different goroutine
 	wg := sync.WaitGroup{}
 	solutionLock := sync.Mutex{}
-	var solution []Move
+	var solution []gocube.Move
 	for _, move := range s.moves {
 		wg.Add(1)
 		newState := st
 		newState.Move(move)
-		go func(m Move) {
-			var res []Move
+		go func(m gocube.Move) {
+			var res []gocube.Move
 			if d == 1 {
 				res = s.regularSearch(newState, max-1)
 			} else {
@@ -110,7 +103,7 @@ func (s *CubieCubeSearch) distSearch(st CubieCube, max int, d int) []Move {
 			}
 			if res != nil {
 				solutionLock.Lock()
-				solution = append([]Move{m}, res...)
+				solution = append([]gocube.Move{m}, res...)
 				solutionLock.Unlock()
 				s.Cancel()
 			}
@@ -122,11 +115,11 @@ func (s *CubieCubeSearch) distSearch(st CubieCube, max int, d int) []Move {
 	return solution
 }
 
-func (s *CubieCubeSearch) regularSearch(st CubieCube, max int) []Move {
+func (s *Search) regularSearch(st gocube.CubieCube, max int) []gocube.Move {
 	// If we can't search any further, check if it's the goal.
 	if max == 0 {
 		if s.goal.IsGoal(st) {
-			return []Move{}
+			return []gocube.Move{}
 		}
 		return nil
 	}
@@ -145,22 +138,14 @@ func (s *CubieCubeSearch) regularSearch(st CubieCube, max int) []Move {
 		newState := st
 		newState.Move(move)
 		if res := s.regularSearch(newState, max-1); res != nil {
-			return append([]Move{move}, res...)
+			return append([]gocube.Move{move}, res...)
 		}
 	}
 
 	return nil
 }
 
-func (s *CubieCubeSearch) search(max int, distribute int) []Move {
-	if distribute > 0 {
-		return s.distSearch(s.start, max, distribute)
-	} else {
-		return s.regularSearch(s.start, max)
-	}
-}
-
-func (s *CubieCubeSearch) shouldStop() bool {
+func (s *Search) shouldStop() bool {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 	return s.cancelled

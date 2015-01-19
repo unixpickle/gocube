@@ -1,4 +1,4 @@
-package searchargs
+package args
 
 import (
 	"flag"
