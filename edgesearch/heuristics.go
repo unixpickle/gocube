@@ -12,6 +12,40 @@ type PhaseOneHeuristic struct {
 	Counts    [1013760]int8
 }
 
+// MakePhaseOneHeuristic uses a breadth-first search to generate a
+// PhaseOneHeuristic.
+func MakePhaseOneHeuristic(moves []gocube.Move) *PhaseOneHeuristic {
+	res := NewPhaseOneHeuristic()
+
+	// Set every move count to -1 so we know which one's we haven't visited.
+	for i := 0; i < 1013760; i++ {
+		res.Counts[i] = -1
+	}
+
+	// Perform a very basic breadth-first search.
+	nodes := []searchNode{searchNode{gocube.SolvedCubieEdges(), 0}}
+	for len(nodes) > 0 {
+		node := nodes[0]
+		nodes = nodes[1:]
+		idx := res.Encode(node.State)
+
+		if res.Counts[idx] >= 0 {
+			// Node was already visited
+			continue
+		}
+
+		// Expand the node
+		res.Counts[idx] = int8(node.Depth)
+		for _, move := range moves {
+			state := node.State
+			state.Move(move)
+			nodes = append(nodes, searchNode{state, node.Depth + 1})
+		}
+	}
+
+	return res
+}
+
 // NewPhaseOneHeuristic creates a PhaseOneHeuristic with zeroes for every count
 // and a generated ChooseMap.
 func NewPhaseOneHeuristic() *PhaseOneHeuristic {
@@ -53,6 +87,12 @@ func (h *PhaseOneHeuristic) Encode(c gocube.CubieEdges) int {
 	eoVal := encodeEO(c)
 
 	return chooseVal*0x800 + eoVal
+}
+
+// MinMoves returns the minimum number of moves needed to reach the solved
+// phase one state for a given set of edges.
+func (h *PhaseOneHeuristic) MinMoves(c gocube.CubieEdges) int {
+	return int(h.Counts[h.Encode(c)])
 }
 
 // An OrientHeuristic stores the number of moves required to solve every EO
