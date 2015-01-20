@@ -34,7 +34,7 @@ func (_ EOLineGoal) IsGoal(c gocube.CubieEdges) bool {
 			return false
 		}
 	}
-	
+
 	// Make sure the line edges are solved.
 	return c[2].Piece == 2 && c[8].Piece == 8
 }
@@ -50,7 +50,7 @@ func (_ PhaseOneGoal) IsGoal(c gocube.CubieEdges) bool {
 			return false
 		}
 	}
-	
+
 	// Make sure the E slice edges (1, 3, 7, 9) are in the E slice.
 	for _, i := range []int{1, 3, 7, 9} {
 		piece := c[i].Piece
@@ -58,6 +58,6 @@ func (_ PhaseOneGoal) IsGoal(c gocube.CubieEdges) bool {
 			return false
 		}
 	}
-	
+
 	return true
 }
