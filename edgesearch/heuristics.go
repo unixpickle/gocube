@@ -8,11 +8,36 @@ import (
 // configuration.
 type OrientHeuristic [0x800]int
 
-// MakeOrientHeuristic uses search to generate an OrientHeuristic.
+// MakeOrientHeuristic uses breadth-first search to generate an OrientHeuristic.
 // This should run pretty fast.
-func MakeOrientHeuristic() *OrientHeuristic {
+func MakeOrientHeuristic(moves []gocube.Move) *OrientHeuristic {
 	var res OrientHeuristic
-	// TODO: do a breadth-first seacrh here
+	
+	for i := 0; i < 0x800; i++ {
+		res[i] = -1
+	}
+	
+	// Perform a very basic breadth-first search.
+	nodes := []searchNode{searchNode{gocube.SolvedCubieEdges(), 0}}
+	for len(nodes) > 0 {
+		node := nodes[0]
+		nodes = nodes[1:]
+		idx := encodeEdges(node.State)
+		
+		if res[idx] >= 0 {
+			// Node was already visited
+			continue
+		}
+		
+		// Expand the node
+		res[idx] = node.Depth
+		for _, move := range moves {
+			state := node.State
+			state.Move(move)
+			nodes = append(nodes, searchNode{state, node.Depth+1})
+		}
+	}
+	
 	return &res
 }
 
@@ -25,8 +50,13 @@ func encodeEdges(e gocube.CubieEdges) int {
 	encodedEdges := 0
 	for i := 0; i < 11; i++ {
 		if e[i].Flip {
-			encodedEdges[i] |= (1 << uint(i))
+			encodedEdges |= (1 << uint(i))
 		}
 	}
 	return encodedEdges
+}
+
+type searchNode struct {
+	State gocube.CubieEdges
+	Depth int
 }
