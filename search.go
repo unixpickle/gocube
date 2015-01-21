@@ -41,12 +41,12 @@ type simpleSearch struct {
 	// It is a uint32 so that it can be used with the "atomic" package.
 	cancelFlag uint32
 
-	depth   int
+	moves   []Move
 	channel chan []Move
 }
 
-func newSimpleSearch(depth int) *simpleSearch {
-	return &simpleSearch{0, depth, make(chan []Move)}
+func newSimpleSearch(moves []Move) *simpleSearch {
+	return &simpleSearch{0, moves, make(chan []Move)}
 }
 
 func (s *simpleSearch) Cancel() {
