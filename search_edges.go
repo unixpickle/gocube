@@ -4,13 +4,13 @@ import (
 	"sync"
 )
 
-// A EdgesGoal represents an abstract goal state for a depth-first search of the
-// cube's edges.
+// An EdgesGoal represents an abstract goal state for a depth-first search of
+// the cube's edges.
 type EdgesGoal interface {
 	IsGoal(c CubieEdges) bool
 }
 
-// A EdgesPruner is used as a lower-bound heuristic for a depth-first search of
+// An EdgesPruner is used as a lower-bound heuristic for a depth-first search of
 // the cube's edges.
 type EdgesPruner interface {
 	MinMoves(c CubieEdges) int
