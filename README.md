@@ -16,4 +16,4 @@ The following things must be done:
    * Implement corner goal
    * Create corner heuristic
  * Implement phase-two solver
-   * Create heuristic 
+   * Create heuristic
