@@ -6,12 +6,12 @@ import (
 
 func TestParseMove(t *testing.T) {
 	moves := map[string]Move{
-		"U": Move{1, 1},
-		"D": Move{2, 1},
-		"F": Move{3, 1},
-		"B": Move{4, 1},
-		"R": Move{5, 1},
-		"L": Move{6, 1},
+		"U":  Move{1, 1},
+		"D":  Move{2, 1},
+		"F":  Move{3, 1},
+		"B":  Move{4, 1},
+		"R":  Move{5, 1},
+		"L":  Move{6, 1},
 		"U'": Move{1, -1},
 		"D'": Move{2, -1},
 		"F'": Move{3, -1},

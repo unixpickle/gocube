@@ -11,7 +11,7 @@ func BenchmarkCubieToSticker(b *testing.B) {
 	for _, move := range moves {
 		cubie.Move(move)
 	}
-	
+
 	// Convert it to a sticker cube N times.
 	for i := 0; i < b.N; i++ {
 		cubie.StickerCube()
@@ -21,7 +21,7 @@ func BenchmarkCubieToSticker(b *testing.B) {
 func BenchmarkStickerToCubie(b *testing.B) {
 	stickers, _ := ParseStickerCube("OGBYWWOOY OWOGYGGBR WBBGGOBRB " +
 		"RWYYBRWYR RBWWROWYG GRGBORYOY")
-	
+
 	// Convert it to a sticker cube N times.
 	for i := 0; i < b.N; i++ {
 		stickers.CubieCube()
@@ -35,7 +35,7 @@ func TestCubieToSticker(t *testing.T) {
 	for _, move := range moves {
 		cubie.Move(move)
 	}
-	
+
 	stickers := cubie.StickerCube()
 	str := "OGBYWWOOY OWOGYGGBR WBBGGOBRB RWYYBRWYR RBWWROWYG GRGBORYOY"
 	if stickers.String() != str {
@@ -44,7 +44,7 @@ func TestCubieToSticker(t *testing.T) {
 }
 
 func TestStickerToCubieIdentity(t *testing.T) {
-	stickers, err := ParseStickerCube("111111111 222222222 333333333 " + 
+	stickers, err := ParseStickerCube("111111111 222222222 333333333 " +
 		"444444444 555555555 666666666")
 	if err != nil {
 		t.Error(err)
@@ -60,7 +60,7 @@ func TestStickerToCubieIdentity(t *testing.T) {
 			t.Error("Invalid corner at index", i)
 		}
 	}
-	
+
 	for i := 0; i < 12; i++ {
 		if cubies.Edges[i].Piece != i || cubies.Edges[i].Flip {
 			t.Error("Invalid edge at index", i)
@@ -81,14 +81,14 @@ func TestStickerToCube(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	
+
 	// Run algorithm for comparison
 	answer := SolvedCubieCube()
 	moves, _ := ParseMoves("B U D B' L2 D' R' F2 L F D2 R2 F' U2 R B2 L' U'")
 	for _, move := range moves {
 		answer.Move(move)
 	}
-	
+
 	// Make sure the cubes are equal
 	for i, x := range answer.Corners {
 		c := cubies.Corners[i]

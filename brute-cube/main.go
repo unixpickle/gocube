@@ -17,7 +17,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	goal := gocube.SolvedCubeGoal{}
+	goal := gocube.SolveCubeGoal{}
 	moves, _ := gocube.ParseMoves("R U L D R' U' L' D' R2 U2 L2 D2 F B F' B' " +
 		"F2 B2")
 	for i := 0; i < 20; i++ {

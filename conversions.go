@@ -86,7 +86,7 @@ func (c *CubieCube) StickerCube() StickerCube {
 		idx := piece.Piece * 3
 		s1, s2, s3 := CornerPieces[idx], CornerPieces[idx+1],
 			CornerPieces[idx+2]
-		
+
 		// Transform corner piece to move to its current position.
 		// If an odd number of quarter turns were needed to move it to this
 		// position, the corner's permutation is in the odd-parity coset.
@@ -95,14 +95,14 @@ func (c *CubieCube) StickerCube() StickerCube {
 			difference == 7 {
 			s2, s3 = s3, s2
 		}
-		
+
 		// Twist the corner piece
 		if piece.Orientation == 1 {
 			s1, s2, s3 = s3, s1, s2
 		} else if piece.Orientation == 2 {
 			s1, s2, s3 = s2, s3, s1
 		}
-		
+
 		destIdx := i * 3
 		res[CornerIndexes[destIdx]] = s1
 		res[CornerIndexes[destIdx+1]] = s2

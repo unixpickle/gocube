@@ -16,11 +16,11 @@ type CubePruner interface {
 	MinMoves(c CubieCube) int
 }
 
-// A SolvedCubeGoal is satisfied when a CubieCube is completely solved.
-type SolvedCubeGoal struct{}
+// A SolveCubeGoal is satisfied when a CubieCube is completely solved.
+type SolveCubeGoal struct{}
 
 // IsGoal returns cube.Solved().
-func (_ SolvedCubeGoal) IsGoal(cube CubieCube) bool {
+func (_ SolveCubeGoal) IsGoal(cube CubieCube) bool {
 	return cube.Solved()
 }
 

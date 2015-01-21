@@ -56,13 +56,13 @@ func BenchmarkCubieEdgesMove(b *testing.B) {
 
 func TestCubieCorners(t *testing.T) {
 	corners := SolvedCubieCorners()
-	
+
 	// Perform a full scramble on the corners.
 	moves, _ := ParseMoves("B U D B' L2 D' R' F2 L F D2 R2 F' U2 R B2 L' U'")
 	for _, move := range moves {
 		corners.Move(move)
 	}
-	
+
 	// Verify that the pieces are right.
 	pieces := []int{5, 7, 4, 3, 0, 2, 6, 1}
 	for i, corner := range corners {
@@ -70,7 +70,7 @@ func TestCubieCorners(t *testing.T) {
 			t.Error("Invalid piece at", i)
 		}
 	}
-	
+
 	// Verify that the orientations are right.
 	orientations := []int{2, 1, 1, 2, 1, 1, 1, 0}
 	for i, corner := range corners {
@@ -82,13 +82,13 @@ func TestCubieCorners(t *testing.T) {
 
 func TestCubieEdges(t *testing.T) {
 	edges := SolvedCubieEdges()
-	
+
 	// Perform a full scramble on the edges.
 	moves, _ := ParseMoves("B U D B' L2 D' R' F2 L F D2 R2 F' U2 R B2 L' U'")
 	for _, move := range moves {
 		edges.Move(move)
 	}
-	
+
 	// Verify that the edges are the way they should be.
 	pieces := []int{9, 4, 5, 1, 11, 6, 0, 10, 8, 7, 3, 2}
 	for i, edge := range edges {
@@ -96,7 +96,7 @@ func TestCubieEdges(t *testing.T) {
 			t.Error("Invalid edge piece at index", i)
 		}
 	}
-	
+
 	// Verify the orientation map.
 	orientations := []bool{true, true, false, false, false, false, true, false,
 		true, true, false, true}
