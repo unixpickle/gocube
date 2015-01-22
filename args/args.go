@@ -14,6 +14,7 @@ type Args struct {
 	branch      *int
 	maxDepth    *int
 	minDepth    *int
+	multiple    *bool
 }
 
 // NewArgs creates a new Args object given a FlagSet.
@@ -25,6 +26,7 @@ func NewArgs(f *flag.FlagSet) *Args {
 	res.branch = f.Int("branch", 1, "The parallelization depth")
 	res.maxDepth = f.Int("maxdepth", 20, "The maximum search depth")
 	res.minDepth = f.Int("mindepth", 0, "The minimum search depth")
+	res.multiple = f.Bool("multiple", false, "Find multiple solutions")
 	return res
 }
 
@@ -46,6 +48,11 @@ func (a *Args) MinDepth() int {
 // Moves returns the basis moves.
 func (a *Args) Moves() []gocube.Move {
 	return a.moves
+}
+
+// Multiple returns the multiple solutions argument.
+func (a *Args) Multiple() bool {
+	return *a.multiple
 }
 
 // Parse processes the supplied arguments and (possibly) asks the user for
