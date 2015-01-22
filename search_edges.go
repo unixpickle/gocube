@@ -16,27 +16,11 @@ type EdgesPruner interface {
 	MinMoves(c CubieEdges) int
 }
 
-// An EOLineGoal is satisfied when a CubieEdges has the edge-orientation line as
-// defined by the ZZ method.
-type EOLineGoal struct{}
-
-func (_ EOLineGoal) IsGoal(c CubieEdges) bool {
-	// Make sure the edges are oriented.
-	for _, p := range c {
-		if p.Flip {
-			return false
-		}
-	}
-
-	// Make sure the line edges are solved.
-	return c[2].Piece == 2 && c[8].Piece == 8
-}
-
-// An OrientEdgesGoal is satisfied when a CubieEdges has no flipped edges.
-type OrientEdgesGoal struct{}
+// An EOGoal is satisfied when a CubieEdges has no flipped edges.
+type EOGoal struct{}
 
 // IsGoal returns true if no edges are flipped.
-func (_ OrientEdgesGoal) IsGoal(edges CubieEdges) bool {
+func (_ EOGoal) IsGoal(edges CubieEdges) bool {
 	for _, x := range edges {
 		if x.Flip {
 			return false
@@ -45,14 +29,13 @@ func (_ OrientEdgesGoal) IsGoal(edges CubieEdges) bool {
 	return true
 }
 
-// An OrientEdgesPruner stores the number of moves required to solve every EO
+// An EOPruner stores the number of moves required to solve every EO
 // configuration.
-type OrientEdgesPruner [0x800]int
+type EOPruner [0x800]int
 
-// MakeOrientEdgesPruner uses breadth-first search to generate an
-// OrientEdgesHeuristic.
-func MakeOrientEdgesPruner(moves []Move) *OrientEdgesPruner {
-	var res OrientEdgesPruner
+// MakeEOPruner uses breadth-first search to generate an EOPruner.
+func MakeEOPruner(moves []Move) *EOPruner {
+	var res EOPruner
 
 	for i := 0; i < 0x800; i++ {
 		res[i] = -1
@@ -83,8 +66,25 @@ func MakeOrientEdgesPruner(moves []Move) *OrientEdgesPruner {
 }
 
 // MinMoves returns the number of moves required to orient all the edges.
-func (o *OrientEdgesPruner) MinMoves(e CubieEdges) int {
+func (o *EOPruner) MinMoves(e CubieEdges) int {
 	return o[encodeEO(e)]
+}
+
+// An EOLineGoal is satisfied when a CubieEdges has the edge-orientation line as
+// defined by the ZZ method.
+type EOLineGoal struct{}
+
+// IsGoal returns true if the edges have the EOLine solved.
+func (_ EOLineGoal) IsGoal(c CubieEdges) bool {
+	// Make sure the edges are oriented.
+	for _, p := range c {
+		if p.Flip {
+			return false
+		}
+	}
+
+	// Make sure the line edges are solved.
+	return c[2].Piece == 2 && c[8].Piece == 8
 }
 
 // A SolveEdgesGoal is satisfied when a CubieEdges is completely solved.

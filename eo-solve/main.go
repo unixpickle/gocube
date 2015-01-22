@@ -24,7 +24,7 @@ func main() {
 	goal := gocube.EOLineGoal{}
 	start := scramble.Edges
 	fmt.Println("Generating heuristic...")
-	pruner := gocube.MakeOrientEdgesPruner(moves)
+	pruner := gocube.MakeEOPruner(moves)
 	
 	for i := 0; i <= 9; i++ {
 		fmt.Println("Exploring depth", i, "...")
