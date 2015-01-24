@@ -10,8 +10,7 @@ I don't know the best way to solve the cube on a computer. Thus, I will make thi
 
 The following things must be done:
 
- * Change search to send solutions on a channel
-   * Allow more than one solution to be obtained
+ * Create corners solver
  * Implement phase-one solver
    * Implement corner goal
    * Create corner heuristic
