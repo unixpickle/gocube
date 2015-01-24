@@ -5,6 +5,60 @@ import (
 	"sync"
 )
 
+// A COGoal is satisfied when the corners are all oriented.
+type COGoal struct{}
+
+func (_ COGoal) IsGoal(c CubieCorners) bool {
+	for _, x := range c {
+		if x.Orientation != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// A COPruner stores the number of moves required to solve every given
+// corner-orientation case.
+type COPruner [2187]int
+
+// MakeCOPruner uses breadth-first search to find all the CO cases.
+func MakeCOPruner(moves []Move) *COPruner {
+	var res COPruner
+
+	for i := 0; i < 2187; i++ {
+		res[i] = -1
+	}
+
+	// Perform a very basic breadth-first search.
+	nodes := []cornersSearchNode{cornersSearchNode{SolvedCubieCorners(), 0}}
+	for len(nodes) > 0 {
+		node := nodes[0]
+		nodes = nodes[1:]
+		idx := node.State.EncodeCO()
+
+		if res[idx] >= 0 {
+			// Node was already visited
+			continue
+		}
+
+		// Expand the node
+		res[idx] = node.Depth
+		for _, move := range moves {
+			state := node.State
+			state.Move(move)
+			nodes = append(nodes, cornersSearchNode{state, node.Depth + 1})
+		}
+	}
+
+	return &res
+}
+
+// MinMoves encodes the corners' orientations and looks it up in the move
+// count table.
+func (c *COPruner) MinMoves(corners CubieCorners) int {
+	return c[corners.EncodeCO()]
+}
+
 // A CornersGoal represents an abstract goal state for a depth-first search of
 // the cube's corners.
 type CornersGoal interface {
@@ -49,6 +103,18 @@ func SolvedCubieCorners() CubieCorners {
 		res[i].Piece = i
 	}
 	return res
+}
+
+// EncodeCO encodes the orientations of the first seven corners as an integer
+// which ranges between 0 (inclusive) and 3^7 (=2,187; exclusive).
+func (c *CubieCorners) EncodeCO() int {
+	result := 0
+	scale := 1
+	for i := 0; i < 7; i++ {
+		result += scale * c[i].Orientation
+		scale *= 3
+	}
+	return result
 }
 
 // HalfTurn performs a 180 degree turn on a given face.
@@ -285,4 +351,9 @@ func (c *cornersSearch) prune(state CubieCorners) int {
 		return 0
 	}
 	return c.pruner.MinMoves(state)
+}
+
+type cornersSearchNode struct {
+	State CubieCorners
+	Depth int
 }
