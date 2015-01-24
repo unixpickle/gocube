@@ -2,7 +2,20 @@ package gocube
 
 import (
 	"strconv"
+	"sync"
 )
+
+// A CornersGoal represents an abstract goal state for a depth-first search of
+// the cube's corners.
+type CornersGoal interface {
+	IsGoal(c CubieCorners) bool
+}
+
+// A CornersPruner is used as a lower-bound heuristic for a depth-first search
+// of the cube's corners.
+type CornersPruner interface {
+	MinMoves(c CubieCorners) int
+}
 
 // A CubieCorner represents a physical corner of a cube.
 //
@@ -163,6 +176,21 @@ func (c *CubieCorners) QuarterTurn(face, turns int) {
 	}
 }
 
+// Search starts a search using the receiver as the starting state.
+// If the specified CornersPruner is nil, no pruning will be performed.
+// The depth argument specifies the maximum depth for the search.
+// The branch argument specifies how many levels of the search to parallelize.
+func (c *CubieCorners) Search(g CornersGoal, p CornersPruner, moves []Move,
+	depth, branch int) Search {
+	res := &cornersSearch{newSimpleSearch(moves), g, p}
+	go func(st CubieCorners) {
+		prefix := make([]Move, 0, depth)
+		searchCornersBranch(st, res, depth, branch, prefix)
+		close(res.channel)
+	}(*c)
+	return res
+}
+
 // Solved returns true if all the corners are properly positioned and oriented.
 func (c *CubieCorners) Solved() bool {
 	for i := 0; i < 8; i++ {
@@ -171,4 +199,90 @@ func (c *CubieCorners) Solved() bool {
 		}
 	}
 	return true
+}
+
+// A SolveCornersGoal is satisfied when a CubieCorners is completely solved.
+type SolveCornersGoal struct{}
+
+// IsGoal returns corners.Solved().
+func (_ SolveCornersGoal) IsGoal(corners CubieCorners) bool {
+	return corners.Solved()
+}
+
+func searchCorners(st CubieCorners, s *cornersSearch, depth int,
+	prefix []Move) {
+	// If we can't search any further, check if it's the goal.
+	if depth == 0 {
+		if s.goal.IsGoal(st) {
+			// We must make a copy of the prefix before sending it as a
+			// solution, since it may be modified after we return.
+			solution := make([]Move, len(prefix))
+			copy(solution, prefix)
+			s.channel <- solution
+		}
+		return
+	}
+
+	// Prune the state
+	if s.prune(st) > depth {
+		return
+	}
+
+	// Apply each move and recurse.
+	for _, move := range s.moves {
+		if depth > 5 && s.cancelled() {
+			return
+		}
+		newState := st
+		newState.Move(move)
+		searchCorners(newState, s, depth-1, append(prefix, move))
+	}
+}
+
+func searchCornersBranch(st CubieCorners, s *cornersSearch, depth, branch int,
+	prefix []Move) {
+	// If we shouldn't branch, do a regular search.
+	if branch == 0 || depth == 0 {
+		searchCorners(st, s, depth, prefix)
+		return
+	}
+
+	// Prune the state
+	if s.prune(st) > depth {
+		return
+	}
+
+	// Run each search on a different goroutine
+	wg := sync.WaitGroup{}
+	for _, move := range s.moves {
+		wg.Add(1)
+		go func(m Move, newState CubieCorners) {
+			// Apply the move
+			newState.Move(m)
+
+			// Create the new prefix by copying the old one.
+			pref := make([]Move, len(prefix)+1, len(prefix)+depth)
+			copy(pref, prefix)
+			pref[len(prefix)] = m
+
+			// Branch out and search.
+			searchCornersBranch(newState, s, depth-1, branch-1, pref)
+
+			wg.Done()
+		}(move, st)
+	}
+	wg.Wait()
+}
+
+type cornersSearch struct {
+	*simpleSearch
+	goal   CornersGoal
+	pruner CornersPruner
+}
+
+func (c *cornersSearch) prune(state CubieCorners) int {
+	if c.pruner == nil {
+		return 0
+	}
+	return c.pruner.MinMoves(state)
 }
