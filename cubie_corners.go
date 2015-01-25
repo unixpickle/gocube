@@ -8,6 +8,7 @@ import (
 // A COGoal is satisfied when the corners are all oriented.
 type COGoal struct{}
 
+// IsGoal returns true if the corners are all oriented.
 func (_ COGoal) IsGoal(c CubieCorners) bool {
 	for _, x := range c {
 		if x.Orientation != 0 {
@@ -57,6 +58,48 @@ func MakeCOPruner(moves []Move) *COPruner {
 // count table.
 func (c *COPruner) MinMoves(corners CubieCorners) int {
 	return c[corners.EncodeCO()]
+}
+
+// A CornerPermPruner records the number of moves to solve every corner
+// permutation.
+type CornerPermPruner map[int]int
+
+// MakeCornerPermPruner creates a new CornerPermPruner using a breadth-first
+// search.
+func MakeCornerPermPruner(moves []Move) CornerPermPruner {
+	res := CornerPermPruner{}
+	
+	// Perform a very basic breadth-first search.
+	nodes := []cornersSearchNode{cornersSearchNode{SolvedCubieCorners(), 0}}
+	for len(nodes) > 0 {
+		node := nodes[0]
+		nodes = nodes[1:]
+		idx := node.State.EncodePerm()
+
+		if _, ok := res[idx]; ok {
+			// Node was already visited
+			continue
+		}
+
+		// Expand the node
+		res[idx] = node.Depth
+		for _, move := range moves {
+			state := node.State
+			state.Move(move)
+			nodes = append(nodes, cornersSearchNode{state, node.Depth + 1})
+		}
+	}
+	
+	return res
+}
+
+// MinMoves returns the number of moves required to solve the corners.
+func (c CornerPermPruner) MinMoves(corners CubieCorners) int {
+	if res, ok := c[corners.EncodePerm()]; !ok {
+		panic("Missing corner case.")
+	} else {
+		return res
+	}
 }
 
 // A CornersGoal represents an abstract goal state for a depth-first search of
@@ -115,6 +158,18 @@ func (c *CubieCorners) EncodeCO() int {
 		scale *= 3
 	}
 	return result
+}
+
+// EncodePerm sub-optimally encodes the corner permutations. The result will
+// range from 0 (inclusive) to 8^7 (exclusive).
+func (c *CubieCorners) EncodePerm() int {
+	res := 0
+	scaler := 1
+	for i := 0; i < 7; i++ {
+		res += c[i].Piece * scaler
+		scaler *= 8
+	}
+	return res
 }
 
 // HalfTurn performs a 180 degree turn on a given face.

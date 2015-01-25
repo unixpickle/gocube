@@ -8,6 +8,26 @@ import (
 	"os"
 )
 
+type JointHeuristic struct {
+	P1 gocube.CornerPermPruner
+	P2 *gocube.COPruner
+}
+
+func NewJointHeuristic(m []gocube.Move) *JointHeuristic {
+	return &JointHeuristic{gocube.MakeCornerPermPruner(m),
+		gocube.MakeCOPruner(m)}
+}
+
+func (j *JointHeuristic) MinMoves(c gocube.CubieCorners) int {
+	m1 := j.P1.MinMoves(c)
+	m2 := j.P2.MinMoves(c)
+	if m1 > m2 {
+		return m1
+	} else {
+		return m2
+	}
+}
+
 func main() {
 	// Input the cube.
 	a := args.NewArgs(flag.CommandLine)
@@ -23,7 +43,7 @@ func main() {
 	goal := gocube.SolveCornersGoal{}
 	start := scramble.Corners
 	fmt.Println("Generating heuristic...")
-	pruner := gocube.MakeCOPruner(moves)
+	pruner := NewJointHeuristic(moves)
 	
 	for i := a.MinDepth(); i <= a.MaxDepth(); i++ {
 		fmt.Println("Exploring depth", i, "...")
