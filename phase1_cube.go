@@ -46,9 +46,16 @@ type Phase1Moves struct {
 // NewPhase1Moves generates tables for applying phase-1 moves.
 func NewPhase1Moves() *Phase1Moves {
 	res := &Phase1Moves{}
-
-	// TODO: generate the E-slice moves
-	// TODO: generate the CO moves
+	
+	// Generate the CO cases and do moves on them.
+	for i := 0; i < 2187; i++ {
+		corners := decodeCO(i);
+		for m := 0; m < 18; m++ {
+			aCase := corners
+			aCase.Move(Move(m))
+			res.COMoves[i][m] = encodeCO(&aCase)
+		}
+	}
 
 	// Generate the EO cases and do moves on them.
 	for i := 0; i < 2048; i++ {
@@ -60,22 +67,45 @@ func NewPhase1Moves() *Phase1Moves {
 		}
 	}
 
+	// Generate the E-slice cases and do moves on them.
+	eSliceCase := 0
+	for w := 0; w < 12; w++ {
+		for x := w+1; x < 12; x++ {
+			for y := x+1; y < 12; y++ {
+				for z := y+1; z < 12; z++ {
+					// The state is bogus, but moves work on it.
+					var edges CubieEdges
+					edges[w].Piece = 1
+					edges[x].Piece = 1
+					edges[y].Piece = 1
+					edges[z].Piece = 1
+					for m := 0; m < 18; m++ {
+						aCase := edges
+						aCase.Move(Move(m))
+						encoded := encodeBogusESlice(&aCase)
+						res.ESliceMoves[eSliceCase][m] = encoded
+					}
+					eSliceCase++
+				}
+			}
+		}
+	}
+
 	return res
 }
 
 func decodeCO(co int) CubieCorners {
 	corners := SolvedCubieCorners()
+	
+	// Compute the orientations of the first 7 corners.
 	scaler := 1
 	for x := 0; x < 7; x++ {
 		corners[x].Orientation = (co/scaler) % 3
 		scaler *= 3
 	}
 
-	// Compute the last corner's orientation.
-	// The way this works is based on the fact that a sune combo which twists two
-	// adjacent corners is all that is necessary to generate any corner
-	// orientation case.
-	ordering := []int{0, 1, 5, 4, 6, 2, 3, 7};
+	// Apply sune combos to orient all the corners except the last one.
+	ordering := []int{0, 1, 5, 4, 6, 2, 3, 7}
 	orientations := make([]int, 8)
 	for i := 0; i < 8; i++ {
 		orientations[i] = corners[ordering[i]].Orientation
@@ -93,6 +123,7 @@ func decodeCO(co int) CubieCorners {
 			orientations[i + 1] = (nextOrientation+1) % 3
 		}
 	}
+	
 	// The twist of the last corner is the inverse of what it should be in the
 	// scramble.
 	if orientations[7] == 1 {
@@ -115,6 +146,24 @@ func decodeEO(eo int) CubieEdges {
 	}
 	edges[11].Flip = parity
 	return edges
+}
+
+func encodeBogusESlice(c *CubieEdges) int {
+	list := make([]bool, 12)
+	for i := 0; i < 12; i++ {
+		list[i] = (*c)[i].Piece == 1
+	}
+	return encodeChoice(list)
+}
+
+func encodeCO(c *CubieCorners) int {
+	res := 0
+	scaler := 1
+	for i := uint(0); i < 7; i++ {
+		res += scaler * (*c)[i].Orientation
+		scaler *= 3
+	}
+	return res
 }
 
 func encodeEO(c *CubieEdges) int {
