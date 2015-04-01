@@ -54,11 +54,10 @@ func (c *CubieEdges) HalfTurn(face int) {
 
 // Move applies a face turn to the edges.
 func (c *CubieEdges) Move(m Move) {
-	// Half turns are a simple case.
-	if m.Turns == 2 {
-		c.HalfTurn(m.Face)
+	if m >= 12 {
+		c.HalfTurn(m.Face())
 	} else {
-		c.QuarterTurn(m.Face, m.Turns)
+		c.QuarterTurn(m.Face(), m.Turns())
 	}
 }
 

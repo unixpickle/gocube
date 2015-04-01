@@ -157,7 +157,7 @@ func findCorner(stickers [3]int) (idx int, orientation int, err error) {
 		}
 		return i, orientation, nil
 	}
-	return 0, 0, errors.New("Unrecognized corner: " +
+	return 0, 0, errors.New("unrecognized corner: " +
 		strconv.Itoa(stickers[0]) + "," + strconv.Itoa(stickers[1]) + "," +
 		strconv.Itoa(stickers[2]))
 }
@@ -183,7 +183,7 @@ func findEdge(stickers [2]int) (idx int, flip bool, err error) {
 		}
 		return i, flip, nil
 	}
-	return 0, false, errors.New("Unrecognized edge: " +
+	return 0, false, errors.New("unrecognized edge: " +
 		strconv.Itoa(stickers[0]) + "," + strconv.Itoa(stickers[1]))
 }
 

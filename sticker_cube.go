@@ -80,7 +80,7 @@ func InputStickerCube() (*StickerCube, error) {
 	}
 	for i, v := range counts {
 		if v != 9 {
-			return nil, errors.New("Invalid number of sticker " +
+			return nil, errors.New("invalid number of sticker " +
 				strconv.Itoa(i))
 		}
 	}
@@ -92,7 +92,7 @@ func InputStickerCube() (*StickerCube, error) {
 func ParseStickerCube(str string) (*StickerCube, error) {
 	faceStrs := strings.Split(str, " ")
 	if len(faceStrs) != 6 {
-		return nil, errors.New("Input must have six faces.")
+		return nil, errors.New("input must have six faces.")
 	}
 
 	var res StickerCube
@@ -132,7 +132,7 @@ func (s *StickerCube) String() string {
 func parseFace(str string, fill int) ([]int, error) {
 	runes := []rune(str)
 	if len(runes) > 9 {
-		return nil, errors.New("Face string cannot exceed nine characters.")
+		return nil, errors.New("face string cannot exceed nine characters.")
 	}
 
 	res := make([]int, 9)
@@ -152,7 +152,7 @@ func parseFace(str string, fill int) ([]int, error) {
 		} else if c == '6' || c == 'O' {
 			res[i] = 6
 		} else {
-			return nil, errors.New("Unexpected character: " + string(c))
+			return nil, errors.New("unexpected character: " + string(c))
 		}
 	}
 

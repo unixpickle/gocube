@@ -6,30 +6,30 @@ import (
 
 func TestParseMove(t *testing.T) {
 	moves := map[string]Move{
-		"U":  Move{1, 1},
-		"D":  Move{2, 1},
-		"F":  Move{3, 1},
-		"B":  Move{4, 1},
-		"R":  Move{5, 1},
-		"L":  Move{6, 1},
-		"U'": Move{1, -1},
-		"D'": Move{2, -1},
-		"F'": Move{3, -1},
-		"B'": Move{4, -1},
-		"R'": Move{5, -1},
-		"L'": Move{6, -1},
-		"U2": Move{1, 2},
-		"D2": Move{2, 2},
-		"F2": Move{3, 2},
-		"B2": Move{4, 2},
-		"R2": Move{5, 2},
-		"L2": Move{6, 2},
+		"U":  NewMove(1, 1),
+		"D":  NewMove(2, 1),
+		"F":  NewMove(3, 1),
+		"B":  NewMove(4, 1),
+		"R":  NewMove(5, 1),
+		"L":  NewMove(6, 1),
+		"U'": NewMove(1, -1),
+		"D'": NewMove(2, -1),
+		"F'": NewMove(3, -1),
+		"B'": NewMove(4, -1),
+		"R'": NewMove(5, -1),
+		"L'": NewMove(6, -1),
+		"U2": NewMove(1, 2),
+		"D2": NewMove(2, 2),
+		"F2": NewMove(3, 2),
+		"B2": NewMove(4, 2),
+		"R2": NewMove(5, 2),
+		"L2": NewMove(6, 2),
 	}
 	for str, expect := range moves {
 		move, err := ParseMove(str)
 		if err != nil {
 			t.Error(err)
-		} else if expect.Face != move.Face || expect.Turns != move.Turns {
+		} else if expect != move {
 			t.Error("Unexpected result for:", str)
 		}
 	}
@@ -48,13 +48,13 @@ func TestParseMoves(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	moves := []Move{Move{5, 2}, Move{4, 1}, Move{2, -1}, Move{3, 1}}
+	moves := []Move{NewMove(5, 2), NewMove(4, 1), NewMove(2, -1), NewMove(3, 1)}
 	if len(parsed) != len(moves) {
 		t.Error("Invalid move count for:", movesString)
 		return
 	}
 	for i, x := range parsed {
-		if x.Turns != moves[i].Turns || x.Face != moves[i].Face {
+		if x != moves[i] {
 			t.Error("Invalid move at index", i)
 		}
 	}
