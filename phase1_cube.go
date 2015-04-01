@@ -1,11 +1,24 @@
 package gocube
 
+// xMoveTranslation maps moves from the Y axis phase-1 cube to moves on the X
+// axis cube. The mapping is: F->F, B->B, U->R, D->L, L->U, R->D.
+// For example, doing U on a Y-axis cube is like doing R on the X-axis version
+// of that cube.
+// This mapping is kind of like doing a "z" rotation before the move.
+var xMoveTranslation []Move = []Move{4, 5, 2, 3, 1, 0, 10, 11, 8, 9, 7, 6, 16,
+	17, 14, 15, 13, 12}
+
+// zMoveTranslation is like xMoveTranslation, but it's for doing an "x" rotation
+// before applying a move. The mapping is: R->R, L->L, F->U, B->D, U->B, D->F.
+var zMoveTranslation []Move = []Move{3, 2, 0, 1, 4, 5, 9, 8, 6, 7, 10, 11, 15,
+	14, 12, 13, 16, 17}
+
 // A Phase1Axis represents the y-axis corner orientations, ZZ edge orientations,
 // and the permutation of the E slice.
 type Phase1Axis struct {
 	CornerOrientations int
-	EdgeOrientations	 int
-	SlicePerm					int
+	EdgeOrientations   int
+	SlicePerm          int
 }
 
 // A Phase1Cube is an efficient way to represent the parts of a cube which
@@ -26,9 +39,23 @@ type Phase1Cube struct {
 	MSlicePermutation int
 }
 
-// Move applies a move on a Phase1Cube using a moves table.
-func (p *Phase1Cube) Move(m Move, table *Phase1Moves) {
-	// TODO: apply the move to each axis of the represented data.
+// Move applies a move to a Phase1Cube.
+func (p *Phase1Cube) Move(m Move, moves *Phase1Moves) {
+	// Apply the move to the y-axis cube.
+	p.YCornerOrientation = moves.COMoves[p.YCornerOrientation][m]
+	p.FBEdgeOrientation = moves.EOMoves[p.FBEdgeOrientation][m]
+	p.ESlicePermutation = moves.ESliceMoves[p.ESlicePermutation][m]
+	
+	// Apply the move to the z-axis cube.
+	zMove := zMoveTranslation[m]
+	p.ZCornerOrientation = moves.COMoves[p.ZCornerOrientation][zMove]
+	p.UDEdgeOrientation = moves.EOMoves[p.UDEdgeOrientation][zMove]
+	p.SSlicePermutation = moves.ESliceMoves[p.SSlicePermutation][zMove]
+	
+	// Apply the move to the x-axis cube.
+	xMove := xMoveTranslation[m]
+	p.XCornerOrientation = moves.COMoves[p.XCornerOrientation][xMove]
+	p.MSlicePermutation = moves.ESliceMoves[p.SSlicePermutation][xMove]
 }
 
 // Phase1Moves is a table containing the necessary data to efficiently perform
