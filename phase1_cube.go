@@ -48,8 +48,38 @@ func NewPhase1Moves() *Phase1Moves {
 	res := &Phase1Moves{}
 
 	// TODO: generate the E-slice moves
-	// TODO: generate the EO moves
 	// TODO: generate the CO moves
 
+	// Generate the EO cases and do moves on them.
+	for i := 0; i < 2048; i++ {
+		// Generate a CubieEdges object for this EO case.
+		edges := SolvedCubieEdges()
+		parity := false
+		for x := 0; x < 11; x++ {
+			if (i & (1 << x)) != 0 {
+				parity = !parity
+				edges[x].Flip = true
+			}
+		}
+		edges[11].Flip = parity
+
+		// Apply each move and encode the result.
+		for m := 0; m < 18; m++ {
+			aCase := edges
+			aCase.Move(Move(m))
+			res.EOMoves[i][m] = encodeEO(&aCase)
+		}
+	}
+
+	return res
+}
+
+func encodeEO(c *CubieEdges) int {
+	res := 0
+	for i := 0; i < 11; i++ {
+		if (*c)[i].Flip {
+			res |= (1 << i)
+		}
+	}
 	return res
 }
