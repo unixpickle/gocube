@@ -4,8 +4,8 @@ package gocube
 // and the permutation of the E slice.
 type Phase1Axis struct {
 	CornerOrientations int
-	EdgeOrientations   int
-	SlicePerm          int
+	EdgeOrientations	 int
+	SlicePerm					int
 }
 
 // A Phase1Cube is an efficient way to represent the parts of a cube which
@@ -71,7 +71,35 @@ func decodeCO(co int) CubieCorners {
 		scaler *= 3
 	}
 
-	// TODO: compute the flip of the last corner
+	// Compute the last corner's orientation.
+	// The way this works is based on the fact that a sune combo which twists two
+	// adjacent corners is all that is necessary to generate any corner
+	// orientation case.
+	ordering := []int{0, 1, 5, 4, 6, 2, 3, 7};
+	orientations := make([]int, 8)
+	for i := 0; i < 8; i++ {
+		orientations[i] = corners[ordering[i]].Orientation
+	}
+	for i := 0; i < 7; i++ {
+		thisOrientation := orientations[i]
+		nextOrientation := orientations[i + 1]
+		// Twist thisOrientation to be solved, affecting the next corner in the
+		// sequence.
+		if thisOrientation == 1 {
+			// y -> x, x -> z, z -> y
+			orientations[i + 1] = (nextOrientation+2) % 3
+		} else if thisOrientation == 2 {
+			// z -> x, x -> y, y -> z
+			orientations[i + 1] = (nextOrientation+1) % 3
+		}
+	}
+	// The twist of the last corner is the inverse of what it should be in the
+	// scramble.
+	if orientations[7] == 1 {
+		corners[7].Orientation = 2
+	} else if orientations[7] == 2 {
+		corners[7].Orientation = 1
+	}
 
 	return corners
 }
@@ -79,8 +107,8 @@ func decodeCO(co int) CubieCorners {
 func decodeEO(eo int) CubieEdges {
 	edges := SolvedCubieEdges()
 	parity := false
-	for x := 0; x < 11; x++ {
-		if (i & (1 << x)) != 0 {
+	for x := uint(0); x < 11; x++ {
+		if (x & (1 << x)) != 0 {
 			parity = !parity
 			edges[x].Flip = true
 		}
@@ -91,7 +119,7 @@ func decodeEO(eo int) CubieEdges {
 
 func encodeEO(c *CubieEdges) int {
 	res := 0
-	for i := 0; i < 11; i++ {
+	for i := uint(0); i < 11; i++ {
 		if (*c)[i].Flip {
 			res |= (1 << i)
 		}
