@@ -47,7 +47,7 @@ func encodeExplicitChoice(choice []bool, start, numTrue int) int {
 	} else if numTrue == 1 {
 		for i := start; i < len(choice); i++ {
 			if choice[i] {
-				return i
+				return i - start
 			}
 		}
 	}

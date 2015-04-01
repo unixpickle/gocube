@@ -166,7 +166,7 @@ func decodeEO(eo int) CubieEdges {
 	edges := SolvedCubieEdges()
 	parity := false
 	for x := uint(0); x < 11; x++ {
-		if (x & (1 << x)) != 0 {
+		if (eo & (1 << x)) != 0 {
 			parity = !parity
 			edges[x].Flip = true
 		}
