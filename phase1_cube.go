@@ -40,7 +40,7 @@ func (p *Phase1Cube) Move(m Move, table *Phase1Moves) {
 type Phase1Moves struct {
 	ESliceMoves [495][18]int
 	EOMoves [2048][18]int
-	COMoves [2048][18]int
+	COMoves [2187][18]int
 }
 
 // NewPhase1Moves generates tables for applying phase-1 moves.
@@ -52,18 +52,7 @@ func NewPhase1Moves() *Phase1Moves {
 
 	// Generate the EO cases and do moves on them.
 	for i := 0; i < 2048; i++ {
-		// Generate a CubieEdges object for this EO case.
-		edges := SolvedCubieEdges()
-		parity := false
-		for x := 0; x < 11; x++ {
-			if (i & (1 << x)) != 0 {
-				parity = !parity
-				edges[x].Flip = true
-			}
-		}
-		edges[11].Flip = parity
-
-		// Apply each move and encode the result.
+		edges := decodeEO(i)
 		for m := 0; m < 18; m++ {
 			aCase := edges
 			aCase.Move(Move(m))
@@ -72,6 +61,32 @@ func NewPhase1Moves() *Phase1Moves {
 	}
 
 	return res
+}
+
+func decodeCO(co int) CubieCorners {
+	corners := SolvedCubieCorners()
+	scaler := 1
+	for x := 0; x < 7; x++ {
+		corners[x].Orientation = (co/scaler) % 3
+		scaler *= 3
+	}
+
+	// TODO: compute the flip of the last corner
+
+	return corners
+}
+
+func decodeEO(eo int) CubieEdges {
+	edges := SolvedCubieEdges()
+	parity := false
+	for x := 0; x < 11; x++ {
+		if (i & (1 << x)) != 0 {
+			parity = !parity
+			edges[x].Flip = true
+		}
+	}
+	edges[11].Flip = parity
+	return edges
 }
 
 func encodeEO(c *CubieEdges) int {
