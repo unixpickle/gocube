@@ -142,10 +142,10 @@ func decodeCO(co int) CubieCorners {
 		nextOrientation := orientations[i + 1]
 		// Twist thisOrientation to be solved, affecting the next corner in the
 		// sequence.
-		if thisOrientation == 1 {
+		if thisOrientation == 2 {
 			// y -> x, x -> z, z -> y
 			orientations[i + 1] = (nextOrientation+2) % 3
-		} else if thisOrientation == 2 {
+		} else if thisOrientation == 0 {
 			// z -> x, x -> y, y -> z
 			orientations[i + 1] = (nextOrientation+1) % 3
 		}
@@ -153,10 +153,10 @@ func decodeCO(co int) CubieCorners {
 	
 	// The twist of the last corner is the inverse of what it should be in the
 	// scramble.
-	if orientations[7] == 1 {
+	if orientations[7] == 0 {
 		corners[7].Orientation = 2
 	} else if orientations[7] == 2 {
-		corners[7].Orientation = 1
+		corners[7].Orientation = 0
 	}
 
 	return corners

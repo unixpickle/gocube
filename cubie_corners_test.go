@@ -32,7 +32,7 @@ func TestCubieCorners(t *testing.T) {
 	}
 
 	// Verify that the orientations are right.
-	orientations := []int{2, 1, 1, 2, 1, 1, 1, 0}
+	orientations := []int{0, 2, 2, 0, 0, 0, 2, 1}
 	for i, corner := range corners {
 		if corner.Orientation != orientations[i] {
 			t.Error("Invalid orientation at", i)

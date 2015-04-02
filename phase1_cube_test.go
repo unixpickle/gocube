@@ -13,7 +13,7 @@ func TestPhase1Moves(t *testing.T) {
 	
 	// The initial state is a solved phase-1 cube.
 	slice := 220
-	co := 0
+	co := 1093
 	eo := 0
 	
 	// Apply a scramble to the phase-1 cube.
@@ -28,7 +28,7 @@ func TestPhase1Moves(t *testing.T) {
 	// Verify that everything is the way it should be.
 	goalSlice := 337
 	goalEO := 358
-	goalCO := 652
+	goalCO := 881
 	if slice != goalSlice {
 		t.Error("Incorrect slice: expected", goalSlice, "got", slice)
 	}

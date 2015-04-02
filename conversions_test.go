@@ -56,7 +56,7 @@ func TestStickerToCubieIdentity(t *testing.T) {
 		return
 	}
 	for i := 0; i < 8; i++ {
-		if cubies.Corners[i].Piece != i || cubies.Corners[i].Orientation != 0 {
+		if cubies.Corners[i].Piece != i || cubies.Corners[i].Orientation != 1 {
 			t.Error("Invalid corner at index", i)
 		}
 	}

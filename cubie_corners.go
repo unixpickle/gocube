@@ -17,8 +17,8 @@ import "strconv"
 //
 // The orientation of a corner tells how it is twisted. It is an axis number 0,
 // 1, or 2 for x, y, or z respectively. It indicates the direction normal to the
-// red or orange sticker (i.e. the sticker that is usually normal to the x
-// axis).
+// white or yellow sticker (i.e. the sticker that is usually normal to the y
+// axis). The corners of a solved cube all have an orientation of 1.
 type CubieCorner struct {
 	Piece       int
 	Orientation int
@@ -32,6 +32,7 @@ func SolvedCubieCorners() CubieCorners {
 	var res CubieCorners
 	for i := 0; i < 8; i++ {
 		res[i].Piece = i
+		res[i].Orientation = 1
 	}
 	return res
 }

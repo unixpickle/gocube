@@ -93,13 +93,13 @@ func (c *CubieCube) StickerCube() StickerCube {
 		difference := (piece.Piece ^ i) & 7
 		if difference == 1 || difference == 2 || difference == 4 ||
 			difference == 7 {
-			s2, s3 = s3, s2
+			s1, s3 = s3, s1
 		}
 
 		// Twist the corner piece
-		if piece.Orientation == 1 {
+		if piece.Orientation == 2 {
 			s1, s2, s3 = s3, s1, s2
-		} else if piece.Orientation == 2 {
+		} else if piece.Orientation == 0 {
 			s1, s2, s3 = s2, s3, s1
 		}
 
@@ -151,9 +151,9 @@ func findCorner(stickers [3]int) (idx int, orientation int, err error) {
 		if !setsEqual(stickers[:], CornerPieces[start:start+3]) {
 			continue
 		}
-		orientation = listIndex(stickers[:], 5)
+		orientation = listIndex(stickers[:], 1)
 		if orientation == -1 {
-			orientation = listIndex(stickers[:], 6)
+			orientation = listIndex(stickers[:], 2)
 		}
 		return i, orientation, nil
 	}
