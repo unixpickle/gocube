@@ -1,5 +1,17 @@
 package gocube
 
+// xCornerIndices are the indexes of the corners on the Y axis cube which
+// correspond to the corners on the X axis cube. An index in this array
+// corresponds to the physical slot in the X axis cube. A value in this array
+// corresponds to the physical slot in the Y axis cube.
+var xCornerIndices []int = []int{1, 3, 0, 2, 5, 7, 4, 6}
+
+// xEdgeIndices are the indexes of the edges on the Y axis cube which correspond
+// to edges on the X axis cube. An index in this array corresponds to the
+// physical slot in the X axis cube. A value in this array corresponds to the
+// physical slot in the Y axis cube.
+var xEdgeIndices []int = []int{3, 0, 1, 2, 10, 4, 9, 6, 7, 8, 11, 5}
+
 // xMoveTranslation maps moves from the Y axis phase-1 cube to moves on the X
 // axis cube. The mapping is: F->F, B->B, U->R, D->L, L->U, R->D.
 // For example, doing U on a Y-axis cube is like doing R on the X-axis version
@@ -7,6 +19,12 @@ package gocube
 // This mapping is kind of like doing a "z" rotation before the move.
 var xMoveTranslation []Move = []Move{4, 5, 2, 3, 1, 0, 10, 11, 8, 9, 7, 6, 16,
 	17, 14, 15, 13, 12}
+
+// zCornerIndices are like xCornerIndices but for the Z axis cube.
+var zCornerIndices []int = []int{2, 3, 6, 7, 0, 1, 4, 5}
+
+// zEdgeIndices are like xEdgeIndices but for the Z axis cube.
+var zEdgeIndices []int = []int{2, 11, 8, 10, 3, 1, 0, 5, 6, 4, 9, 7}
 
 // zMoveTranslation is like xMoveTranslation, but it's for doing an "x" rotation
 // before applying a move. The mapping is: R->R, L->L, F->U, B->D, U->B, D->F.
@@ -151,6 +169,7 @@ func NewPhase1Moves() *Phase1Moves {
 	return res
 }
 
+// Phase1Cube generates a Phase1Cube which reflects the state of a CubieCube.
 func (c *CubieCube) Phase1Cube() Phase1Cube {
 	var res Phase1Cube
 
@@ -180,6 +199,9 @@ func (c *CubieCube) Phase1Cube() Phase1Cube {
 
 	// Translated stuff is too much code to keep in this method.
 	res.UDEdgeOrientation = udEdgeOrientations(&c.Edges)
+	res.XCornerOrientation, res.ZCornerOrientation =
+		xzCornerOrientations(&c.Corners)
+	res.MSlicePermutation, res.SSlicePermutation = xzSlices(&c.Edges)
 
 	return res
 }
@@ -268,8 +290,7 @@ func encodeEO(c *CubieEdges) int {
 
 func udEdgeOrientations(c *CubieEdges) int {
 	res := 0
-	edgeIndexes := []int{2, 11, 8, 10, 3, 1, 0, 5, 6, 4, 9, 7}
-	for i, idx := range edgeIndexes {
+	for i, idx := range zEdgeIndices {
 		edge := (*c)[idx]
 		flip := edge.Flip
 		if edge.Piece == 1 || edge.Piece == 3 || edge.Piece == 7 ||
@@ -292,13 +313,16 @@ func udEdgeOrientations(c *CubieEdges) int {
 	return res
 }
 
-func xzCornerOrientations(c *CubieCorners) int {
-	// For each corner, find the direction of the x and z stickers.
+func xzCornerOrientations(c *CubieCorners) (xVal int, zVal int) {
 	var x [8]int
 	var z [8]int
+
+	// For each corner, find the direction of the x and z stickers.
 	for i := 0; i < 8; i++ {
 		corner := (*c)[i]
-		d := (corner.Piece ^ i) & 7
+
+		// If the corner was in its original slot, here's what the directions
+		// would be.
 		o := corner.Orientation
 		if o == 0 {
 			x[i] = 2
@@ -310,10 +334,42 @@ func xzCornerOrientations(c *CubieCorners) int {
 			x[i] = 1
 			z[i] = 0
 		}
+
 		// If it takes an odd number of quarter turns to move the corner back to
-		// its solved position, swap x and y.
+		// its original slot, swap x and z.
+		d := (corner.Piece ^ i) & 7
 		if d == 1 || d == 2 || d == 4 || d == 7 {
 			x[i], z[i] = z[i], x[i]
 		}
 	}
+
+	// Add the information together to generate the final values.
+	scaler := 1
+	for i := 0; i < 7; i++ {
+		xVal += scaler * x[xCornerIndices[i]]
+		zVal += scaler * z[zCornerIndices[i]]
+		scaler *= 3
+	}
+
+	return
+}
+
+func xzSlices(e *CubieEdges) (x int, z int) {
+	var xChoice [12]bool
+	var zChoice [12]bool
+	for _, i := range xEdgeIndices {
+		// The M slice is the important slice of the X axis cube.
+		p := (*e)[i].Piece
+		if p == 0 || p == 2 || p == 6 || p == 8 {
+			xChoice[i] = true
+		}
+	}
+	for _, i := range zEdgeIndices {
+		// The S slice is the important slice of the Z axis cube.
+		p := (*e)[i].Piece
+		if p == 4 || p == 5 || p == 10 || p == 11 {
+			zChoice[i] = true
+		}
+	}
+	return encodeChoice(xChoice[:]), encodeChoice(zChoice[:])
 }
