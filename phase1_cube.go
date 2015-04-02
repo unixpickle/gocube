@@ -34,9 +34,9 @@ type Phase1Cube struct {
 	FBEdgeOrientation int
 	UDEdgeOrientation int
 
+	MSlicePermutation int
 	ESlicePermutation int
 	SSlicePermutation int
-	MSlicePermutation int
 }
 
 // Move applies a move to a Phase1Cube.
@@ -45,13 +45,13 @@ func (p *Phase1Cube) Move(m Move, moves *Phase1Moves) {
 	p.YCornerOrientation = moves.COMoves[p.YCornerOrientation][m]
 	p.FBEdgeOrientation = moves.EOMoves[p.FBEdgeOrientation][m]
 	p.ESlicePermutation = moves.ESliceMoves[p.ESlicePermutation][m]
-	
+
 	// Apply the move to the z-axis cube.
 	zMove := zMoveTranslation[m]
 	p.ZCornerOrientation = moves.COMoves[p.ZCornerOrientation][zMove]
 	p.UDEdgeOrientation = moves.EOMoves[p.UDEdgeOrientation][zMove]
 	p.SSlicePermutation = moves.ESliceMoves[p.SSlicePermutation][zMove]
-	
+
 	// Apply the move to the x-axis cube.
 	xMove := xMoveTranslation[m]
 	p.XCornerOrientation = moves.COMoves[p.XCornerOrientation][xMove]
@@ -66,17 +66,17 @@ func (p *Phase1Cube) Move(m Move, moves *Phase1Moves) {
 // goals.
 type Phase1Moves struct {
 	ESliceMoves [495][18]int
-	EOMoves [2048][18]int
-	COMoves [2187][18]int
+	EOMoves     [2048][18]int
+	COMoves     [2187][18]int
 }
 
 // NewPhase1Moves generates tables for applying phase-1 moves.
 func NewPhase1Moves() *Phase1Moves {
 	res := &Phase1Moves{}
-	
+
 	// Generate the CO cases and do moves on them.
 	for i := 0; i < 2187; i++ {
-		corners := decodeCO(i);
+		corners := decodeCO(i)
 		for m := 0; m < 18; m++ {
 			aCase := corners
 			aCase.Move(Move(m))
@@ -97,9 +97,9 @@ func NewPhase1Moves() *Phase1Moves {
 	// Generate the E-slice cases and do moves on them.
 	eSliceCase := 0
 	for w := 0; w < 12; w++ {
-		for x := w+1; x < 12; x++ {
-			for y := x+1; y < 12; y++ {
-				for z := y+1; z < 12; z++ {
+		for x := w + 1; x < 12; x++ {
+			for y := x + 1; y < 12; y++ {
+				for z := y + 1; z < 12; z++ {
 					// The state is bogus, but moves work on it.
 					var edges CubieEdges
 					edges[w].Piece = 1
@@ -123,11 +123,11 @@ func NewPhase1Moves() *Phase1Moves {
 
 func decodeCO(co int) CubieCorners {
 	corners := SolvedCubieCorners()
-	
+
 	// Compute the orientations of the first 7 corners.
 	scaler := 1
 	for x := 0; x < 7; x++ {
-		corners[x].Orientation = (co/scaler) % 3
+		corners[x].Orientation = (co / scaler) % 3
 		scaler *= 3
 	}
 
@@ -139,18 +139,18 @@ func decodeCO(co int) CubieCorners {
 	}
 	for i := 0; i < 7; i++ {
 		thisOrientation := orientations[i]
-		nextOrientation := orientations[i + 1]
+		nextOrientation := orientations[i+1]
 		// Twist thisOrientation to be solved, affecting the next corner in the
 		// sequence.
 		if thisOrientation == 2 {
 			// y -> x, x -> z, z -> y
-			orientations[i + 1] = (nextOrientation+2) % 3
+			orientations[i+1] = (nextOrientation + 2) % 3
 		} else if thisOrientation == 0 {
 			// z -> x, x -> y, y -> z
-			orientations[i + 1] = (nextOrientation+1) % 3
+			orientations[i+1] = (nextOrientation + 1) % 3
 		}
 	}
-	
+
 	// The twist of the last corner is the inverse of what it should be in the
 	// scramble.
 	if orientations[7] == 0 {

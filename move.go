@@ -28,12 +28,12 @@ func NewMove(face int, turns int) Move {
 // Face returns the face of the move, which is a number from 1 through 6
 // indicating U, D, F, B, R and L respectively.
 func (m Move) Face() int {
-	return (int(m)%6) + 1
+	return (int(m) % 6) + 1
 }
 
 // Turns returns 1, -1, or 2 to indicate the number of times the face is turned.
 func (m Move) Turns() int {
-	res := int(m)/6
+	res := int(m) / 6
 	if res == 0 {
 		return 1
 	} else if res == 1 {
@@ -88,4 +88,3 @@ func ParseMoves(movesString string) ([]Move, error) {
 	}
 	return res, nil
 }
-

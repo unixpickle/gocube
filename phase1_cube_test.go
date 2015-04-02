@@ -10,12 +10,12 @@ func BenchmarkPhase1Moves(b *testing.B) {
 
 func TestPhase1Moves(t *testing.T) {
 	moves := NewPhase1Moves()
-	
+
 	// The initial state is a solved phase-1 cube.
 	slice := 220
 	co := 1093
 	eo := 0
-	
+
 	// Apply a scramble to the phase-1 cube.
 	scramble, _ := ParseMoves("L R2 B2 F2 L2 U' B2 F U R2 F' L2 R' B' F2 D2 " +
 		"R U' L' R U2 F2 D U' R2 U B2 F D U")
@@ -24,7 +24,7 @@ func TestPhase1Moves(t *testing.T) {
 		co = moves.COMoves[co][x]
 		eo = moves.EOMoves[eo][x]
 	}
-	
+
 	// Verify that everything is the way it should be.
 	goalSlice := 337
 	goalEO := 358

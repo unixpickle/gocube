@@ -1,7 +1,7 @@
 package gocube
 
 var factorials = []int{1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800,
-  39916800, 479001600}
+	39916800, 479001600}
 
 var pascalsTriangle = [][]int{
 	[]int{1},
@@ -21,14 +21,14 @@ var pascalsTriangle = [][]int{
 
 func choose(a, b int) int {
 	if a < 13 {
-		return pascalsTriangle[a][b];
+		return pascalsTriangle[a][b]
 	}
 	res := 1
 	for i := 0; i < b; i++ {
-		res *= a;
-		a -= 1;
+		res *= a
+		a -= 1
 	}
-	return res / factorial(b);
+	return res / factorial(b)
 }
 
 func encodeChoice(choice []bool) int {
@@ -51,7 +51,7 @@ func encodeExplicitChoice(choice []bool, start, numTrue int) int {
 			}
 		}
 	}
-	
+
 	numMissed := 0
 	for i := start; i < len(choice); i++ {
 		if choice[i] {
@@ -60,7 +60,7 @@ func encodeExplicitChoice(choice []bool, start, numTrue int) int {
 		}
 		numMissed += choose(len(choice)-(i+1), numTrue-1)
 	}
-	
+
 	panic("internal inconsistency in encodeExplicitChoice")
 	return -1
 }

@@ -33,4 +33,3 @@ func (c *CubieCube) QuarterTurn(face, turns int) {
 func (c *CubieCube) Solved() bool {
 	return c.Corners.Solved() && c.Edges.Solved()
 }
-
