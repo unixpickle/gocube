@@ -2,6 +2,15 @@ package gocube
 
 import "testing"
 
+func BenchmarkPhase1Cube(b *testing.B) {
+	moves := NewPhase1Moves()
+	cube := SolvedPhase1Cube()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		cube.Move(Move(i%18), moves)
+	}
+}
+
 func BenchmarkPhase1Moves(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		NewPhase1Moves()
