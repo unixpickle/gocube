@@ -178,6 +178,9 @@ func (c *CubieCube) Phase1Cube() Phase1Cube {
 	}
 	res.ESlicePermutation = encodeChoice(eChoice[:])
 
+	// Translated stuff is too much code to keep in this method.
+	res.UDEdgeOrientation = udEdgeOrientations(&c.Edges)
+
 	return res
 }
 
@@ -261,4 +264,56 @@ func encodeEO(c *CubieEdges) int {
 		}
 	}
 	return res
+}
+
+func udEdgeOrientations(c *CubieEdges) int {
+	res := 0
+	edgeIndexes := []int{2, 11, 8, 10, 3, 1, 0, 5, 6, 4, 9, 7}
+	for i, idx := range edgeIndexes {
+		edge := (*c)[idx]
+		flip := edge.Flip
+		if edge.Piece == 1 || edge.Piece == 3 || edge.Piece == 7 ||
+			edge.Piece == 9 {
+			// An E slice edge's orientation is different if it was on the M
+			// slice.
+			if idx == 0 || idx == 2 || idx == 6 || idx == 8 {
+				flip = !flip
+			}
+		} else {
+			// This is not an E-slice edge piece.
+			if idx == 4 || idx == 5 || idx == 10 || idx == 11 {
+				flip = !flip
+			}
+		}
+		if flip {
+			res |= 1 << uint(i)
+		}
+	}
+	return res
+}
+
+func xzCornerOrientations(c *CubieCorners) int {
+	// For each corner, find the direction of the x and z stickers.
+	var x [8]int
+	var z [8]int
+	for i := 0; i < 8; i++ {
+		corner := (*c)[i]
+		d := (corner.Piece ^ i) & 7
+		o := corner.Orientation
+		if o == 0 {
+			x[i] = 2
+			z[i] = 1
+		} else if o == 1 {
+			x[i] = 0
+			z[i] = 2
+		} else {
+			x[i] = 1
+			z[i] = 0
+		}
+		// If it takes an odd number of quarter turns to move the corner back to
+		// its solved position, swap x and y.
+		if d == 1 || d == 2 || d == 4 || d == 7 {
+			x[i], z[i] = z[i], x[i]
+		}
+	}
 }
