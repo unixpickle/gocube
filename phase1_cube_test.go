@@ -8,6 +8,35 @@ func BenchmarkPhase1Moves(b *testing.B) {
 	}
 }
 
+func TestPhase1Cube(t *testing.T) {
+	moves := NewPhase1Moves()
+	cube := SolvedPhase1Cube()
+
+	// Apply a scramble to the phase-1 cube.
+	scramble, _ := ParseMoves("L R2 B2 F2 L2 U' B2 F U R2 F' L2 R' B' F2 D2 " +
+		"R U' L' R U2 F2 D U' R2 U B2 F D U")
+	for _, x := range scramble {
+		cube.Move(x, moves)
+	}
+
+	if cube.YCornerOrientation != 881 || cube.FBEdgeOrientation != 358 ||
+		cube.ESlicePermutation != 337 {
+		t.Error("Invalid Y state:", cube.YCornerOrientation,
+			cube.FBEdgeOrientation, cube.ESlicePermutation)
+	}
+
+	if cube.XCornerOrientation != 1893 || cube.MSlicePermutation != 476 {
+		t.Error("Invalid X state:", cube.XCornerOrientation,
+			cube.MSlicePermutation)
+	}
+
+	if cube.ZCornerOrientation != 43 || cube.SSlicePermutation != 428 ||
+		cube.UDEdgeOrientation != 740 {
+		t.Error("Invalid Z state:", cube.ZCornerOrientation,
+			cube.SSlicePermutation, cube.UDEdgeOrientation)
+	}
+}
+
 func TestPhase1Moves(t *testing.T) {
 	moves := NewPhase1Moves()
 

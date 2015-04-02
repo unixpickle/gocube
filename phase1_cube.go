@@ -39,6 +39,15 @@ type Phase1Cube struct {
 	SSlicePermutation int
 }
 
+// SolvedPhase1Cube returns a solved phase1 cube.
+func SolvedPhase1Cube() Phase1Cube {
+	return Phase1Cube{
+		1093, 1093, 1093,
+		0, 0,
+		220, 220, 220,
+	}
+}
+
 // Move applies a move to a Phase1Cube.
 func (p *Phase1Cube) Move(m Move, moves *Phase1Moves) {
 	// Apply the move to the y-axis cube.
@@ -55,7 +64,36 @@ func (p *Phase1Cube) Move(m Move, moves *Phase1Moves) {
 	// Apply the move to the x-axis cube.
 	xMove := xMoveTranslation[m]
 	p.XCornerOrientation = moves.COMoves[p.XCornerOrientation][xMove]
-	p.MSlicePermutation = moves.ESliceMoves[p.SSlicePermutation][xMove]
+	p.MSlicePermutation = moves.ESliceMoves[p.MSlicePermutation][xMove]
+}
+
+// Solved returns whether the phase-1 cube is solved in all three axes.
+func (p *Phase1Cube) Solved() (x bool, y bool, z bool) {
+	x = true
+	y = true
+	z = true
+	if p.XCornerOrientation != 1093 {
+		x = false
+	} else if p.MSlicePermutation != 220 {
+		x = false
+	} else if p.FBEdgeOrientation != 0 {
+		x = false
+	}
+	if p.YCornerOrientation != 1093 {
+		y = false
+	} else if p.ESlicePermutation != 220 {
+		y = false
+	} else if p.FBEdgeOrientation != 0 {
+		y = false
+	}
+	if p.ZCornerOrientation != 1093 {
+		z = false
+	} else if p.SSlicePermutation != 220 {
+		z = false
+	} else if p.UDEdgeOrientation != 0 {
+		z = false
+	}
+	return
 }
 
 // Phase1Moves is a table containing the necessary data to efficiently perform
