@@ -17,6 +17,28 @@ func BenchmarkPhase1Moves(b *testing.B) {
 	}
 }
 
+func TestPhase1Conversion(t *testing.T) {
+	moves := NewPhase1Moves()
+	goodCube := SolvedPhase1Cube()
+	checkCube := SolvedCubieCube()
+
+	// Apply a scramble to both a Phase1Cube and a CubieCube. Make sure the
+	// result is the same.
+	scramble, _ := ParseMoves("L R2 B2 F2 L2 U' B2 F U R2 F' L2 R' B' F2 D2 " +
+		"R U' L' R U2 F2 D U' R2 U B2 F D U")
+	if goodCube != checkCube.Phase1Cube() {
+		t.Fatal("Identity Phase1Cube is incorrect:", checkCube.Phase1Cube())
+	}
+	for i, move := range scramble {
+		goodCube.Move(move, moves)
+		checkCube.Move(move)
+		if goodCube != checkCube.Phase1Cube() {
+			t.Fatal("Cubes do not match after", i+1, "moves. Good state:",
+				goodCube, "Bad state:", checkCube.Phase1Cube())
+		}
+	}
+}
+
 func TestPhase1Cube(t *testing.T) {
 	moves := NewPhase1Moves()
 	cube := SolvedPhase1Cube()

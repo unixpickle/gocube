@@ -290,19 +290,20 @@ func encodeEO(c *CubieEdges) int {
 
 func udEdgeOrientations(c *CubieEdges) int {
 	res := 0
-	for i, idx := range zEdgeIndices {
+	for i, idx := range zEdgeIndices[:11] {
 		edge := (*c)[idx]
 		flip := edge.Flip
-		if edge.Piece == 1 || edge.Piece == 3 || edge.Piece == 7 ||
-			edge.Piece == 9 {
-			// An E slice edge's orientation is different if it was on the M
-			// slice.
-			if idx == 0 || idx == 2 || idx == 6 || idx == 8 {
+		if edge.Piece == 0 || edge.Piece == 2 || edge.Piece == 6 ||
+			edge.Piece == 8 {
+			// This is an M slice edge piece, so it changes orientation if it
+			// was on the S slice or the E slice.
+			if idx != 0 && idx != 2 && idx != 6 && idx != 8 {
 				flip = !flip
 			}
 		} else {
-			// This is not an E-slice edge piece.
-			if idx == 4 || idx == 5 || idx == 10 || idx == 11 {
+			// This is an E or S slice edge, so it changes orientation if it
+			// was on the M slice.
+			if idx == 0 || idx == 2 || idx == 6 || idx == 8 {
 				flip = !flip
 			}
 		}
@@ -346,8 +347,22 @@ func xzCornerOrientations(c *CubieCorners) (xVal int, zVal int) {
 	// Add the information together to generate the final values.
 	scaler := 1
 	for i := 0; i < 7; i++ {
-		xVal += scaler * x[xCornerIndices[i]]
-		zVal += scaler * z[zCornerIndices[i]]
+		xDirection := x[xCornerIndices[i]]
+		if xDirection == 1 {
+			xDirection = 0
+		} else if xDirection == 0 {
+			xDirection = 1
+		}
+		xVal += scaler * xDirection
+
+		zDirection := z[zCornerIndices[i]]
+		if zDirection == 1 {
+			zDirection = 2
+		} else if zDirection == 2 {
+			zDirection = 1
+		}
+		zVal += scaler * zDirection
+
 		scaler *= 3
 	}
 
@@ -357,16 +372,16 @@ func xzCornerOrientations(c *CubieCorners) (xVal int, zVal int) {
 func xzSlices(e *CubieEdges) (x int, z int) {
 	var xChoice [12]bool
 	var zChoice [12]bool
-	for _, i := range xEdgeIndices {
+	for i, idx := range xEdgeIndices {
 		// The M slice is the important slice of the X axis cube.
-		p := (*e)[i].Piece
+		p := (*e)[idx].Piece
 		if p == 0 || p == 2 || p == 6 || p == 8 {
 			xChoice[i] = true
 		}
 	}
-	for _, i := range zEdgeIndices {
+	for i, idx := range zEdgeIndices {
 		// The S slice is the important slice of the Z axis cube.
-		p := (*e)[i].Piece
+		p := (*e)[idx].Piece
 		if p == 4 || p == 5 || p == 10 || p == 11 {
 			zChoice[i] = true
 		}
