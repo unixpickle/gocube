@@ -13,14 +13,6 @@ var xMoveTranslation []Move = []Move{4, 5, 2, 3, 1, 0, 10, 11, 8, 9, 7, 6, 16,
 var zMoveTranslation []Move = []Move{3, 2, 0, 1, 4, 5, 9, 8, 6, 7, 10, 11, 15,
 	14, 12, 13, 16, 17}
 
-// A Phase1Axis represents the y-axis corner orientations, ZZ edge orientations,
-// and the permutation of the E slice.
-type Phase1Axis struct {
-	CornerOrientations int
-	EdgeOrientations   int
-	SlicePerm          int
-}
-
 // A Phase1Cube is an efficient way to represent the parts of a cube which
 // matter for the first phase of Kociemba's algorithm.
 // The FB edge orientation can be used for both Y and X phase-1 goals, and the
@@ -155,6 +147,36 @@ func NewPhase1Moves() *Phase1Moves {
 			}
 		}
 	}
+
+	return res
+}
+
+func (c *CubieCube) Phase1Cube() Phase1Cube {
+	var res Phase1Cube
+
+	// Encode FB edge orientations
+	for i := uint(0); i < 11; i++ {
+		if c.Edges[i].Flip {
+			res.FBEdgeOrientation |= (1 << i)
+		}
+	}
+
+	// Encode the UD corner orientations
+	scaler := 1
+	for i := 0; i < 7; i++ {
+		res.YCornerOrientation += scaler * c.Corners[i].Orientation
+		scaler *= 3
+	}
+
+	// Encode the E slice permutation
+	var eChoice [12]bool
+	for i := 0; i < 12; i++ {
+		piece := c.Edges[i].Piece
+		if piece == 1 || piece == 3 || piece == 7 || piece == 9 {
+			eChoice[i] = true
+		}
+	}
+	res.ESlicePermutation = encodeChoice(eChoice[:])
 
 	return res
 }
