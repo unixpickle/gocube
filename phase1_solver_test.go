@@ -21,6 +21,24 @@ func BenchmarkNewPhase1HeuristicIncomplete(b *testing.B) {
 	}
 }
 
+func BenchmarkPhase1Solver(b *testing.B) {
+	moves := NewPhase1Moves()
+	heuristic := NewPhase1Heuristic(moves, false)
+	
+	b.ResetTimer()
+	
+	// Do random move sequences and solve each one.
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		cube := SolvedPhase1Cube()
+		for j := 0; j < 50; j++ {
+			cube.Move(Move(rand.Intn(18)), moves)
+		}
+		b.StartTimer()
+		findPhase1Solution(cube, heuristic, moves)
+	}
+}
+
 func TestPhase1Heuristic(t *testing.T) {
 	table := NewPhase1Moves()
 	heuristic := NewPhase1Heuristic(table, false)
