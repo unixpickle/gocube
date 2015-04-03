@@ -106,6 +106,85 @@ func (p *Phase1Heuristic) computeEOSlice(moves *Phase1Moves, complete bool) {
 	}
 }
 
+// A Phase1Solver finds solutions to a specific phase-1 state.
+type Phase1Solver struct {
+	stopped   chan struct{}
+	solutions <-chan []Move
+	
+	heuristic *Phase1Heuristic
+	moves     *Phase1Moves
+}
+
+// NewPhase1Solver creates and starts a Phase1Solver.
+func NewPhase1Solver(c Phase1Cube, h *Phase1Heuristic,
+	m *Phase1Moves) *Phase1Solver {
+	solutions := make(chan []Move)
+	res := &Phase1Solver{make(chan struct{}), solutions, h, m}
+	go res.search(solutions, c)
+	return res
+}
+
+func (p *Phase1Solver) Stop() {
+	close(p.stopped)
+}
+
+func (p *Phase1Solver) depthFirst(solutions chan<- []Move, c Phase1Cube,
+	moves []Move, depth int) bool {
+	// If the depth is zero, we may have a solution.
+	if depth == 0 {
+		if c.AnySolved() {
+			res := make([]Move, len(moves))
+			copy(res, moves)
+			select {
+			case <-p.stopped:
+				return false
+			case solutions <- res:
+			}
+		}
+		return true
+	}
+	
+	// Check the heuristic.
+	if p.heuristic.LowerBound(&c) > depth {
+		return true
+	}
+	
+	// Apply every move and recurse.
+	for m := 0; m < 18; m++ {
+		cube := c
+		move := Move(m)
+		cube.Move(move, p.moves)
+		if !p.depthFirst(solutions, cube, append(moves, move), depth-1) {
+			return false
+		}
+		if depth >= 7 && p.isStopped() {
+			return false
+		}
+	}
+	
+	return true
+}
+
+func (p *Phase1Solver) isStopped() bool {
+	select {
+	case <-p.stopped:
+		return true
+	default:
+		return false
+	}
+}
+
+func (p *Phase1Solver) search(solutions chan<- []Move, c Phase1Cube) {
+	depth := 0
+	for {
+		moves := make([]Move, 0, depth)
+		if !p.depthFirst(solutions, c, moves, depth) {
+			return
+		}
+		depth++
+	}
+}
+
 type phase1CONode struct {
 	corners int
 	depth   int8

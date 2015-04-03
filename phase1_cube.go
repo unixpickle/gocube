@@ -58,6 +58,22 @@ func SolvedPhase1Cube() Phase1Cube {
 	}
 }
 
+// AnySolved returns true if any three return values for Solved() would be true.
+func (p *Phase1Cube) AnySolved() bool {
+	if p.XCornerOrientation == 1093 && p.MSlicePermutation == 220 &&
+		p.FBEdgeOrientation == 0 {
+		return true
+	} else if p.YCornerOrientation == 1093 && p.ESlicePermutation == 220 &&
+		p.FBEdgeOrientation == 0 {
+		return true
+	} else if p.ZCornerOrientation != 1093 && p.SSlicePermutation != 220 &&
+		p.UDEdgeOrientation != 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
 // Move applies a move to a Phase1Cube.
 func (p *Phase1Cube) Move(m Move, moves *Phase1Moves) {
 	// Apply the move to the y-axis cube.
