@@ -66,8 +66,8 @@ func (p *Phase1Cube) AnySolved() bool {
 	} else if p.YCornerOrientation == 1093 && p.ESlicePermutation == 220 &&
 		p.FBEdgeOrientation == 0 {
 		return true
-	} else if p.ZCornerOrientation != 1093 && p.SSlicePermutation != 220 &&
-		p.UDEdgeOrientation != 0 {
+	} else if p.ZCornerOrientation == 1093 && p.SSlicePermutation == 220 &&
+		p.UDEdgeOrientation == 0 {
 		return true
 	} else {
 		return false

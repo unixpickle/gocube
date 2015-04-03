@@ -139,17 +139,17 @@ func parseFace(str string, fill int) ([]int, error) {
 
 	// Read each character of their input.
 	for i, c := range runes {
-		if c == '1' || c == 'W' {
+		if c == '1' || c == 'W' || c == 'w' {
 			res[i] = 1
-		} else if c == '2' || c == 'Y' {
+		} else if c == '2' || c == 'Y' || c == 'y' {
 			res[i] = 2
-		} else if c == '3' || c == 'G' {
+		} else if c == '3' || c == 'G' || c == 'g' {
 			res[i] = 3
-		} else if c == '4' || c == 'B' {
+		} else if c == '4' || c == 'B' || c == 'b' {
 			res[i] = 4
-		} else if c == '5' || c == 'R' {
+		} else if c == '5' || c == 'R' || c == 'r' {
 			res[i] = 5
-		} else if c == '6' || c == 'O' {
+		} else if c == '6' || c == 'O' || c == 'o' {
 			res[i] = 6
 		} else {
 			return nil, errors.New("unexpected character: " + string(c))

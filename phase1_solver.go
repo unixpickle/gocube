@@ -25,9 +25,9 @@ func NewPhase1Heuristic(moves *Phase1Moves, complete bool) *Phase1Heuristic {
 	return res
 }
 
-// LowerBound returns the minimum number of moves needed to solve at least one
-// axis of a Phase1Cube.
-func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
+// AllLowerBound returns the minimum number of moves needed to solve all the
+// phase-1 axes at once.
+func (p *Phase1Heuristic) AllLowerBound(c *Phase1Cube) int {
 	var result int8
 	
 	// Corner orientation heuristic.
@@ -56,6 +56,34 @@ func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
 	}
 	
 	return int(result)
+}
+
+// LowerBound returns the minimum number of moves needed to solve at least one
+// phase-1 axis.
+func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
+	finalResult := int8(127)
+	
+	sliceValues := []int{
+		c.MSlicePermutation*2048 + c.XEdgeOrientation(),
+		c.ESlicePermutation*2048 + c.FBEdgeOrientation,
+		c.SSlicePermutation*2048 + c.UDEdgeOrientation,
+	}
+	coValues := []int{c.XCornerOrientation, c.YCornerOrientation,
+		c.ZCornerOrientation}
+	
+	for axis := 0; axis < 3; axis++ {
+		result := p.CO[coValues[axis]]
+		if r := p.EOSlice[sliceValues[axis]]; r > result {
+			result = r
+		} else if r < 0 && result < 8 {
+			result = 8
+		}
+		if result < finalResult {
+			finalResult = result
+		}
+	}
+	
+	return int(finalResult)
 }
 
 func (p *Phase1Heuristic) computeCO(moves *Phase1Moves) {
@@ -158,9 +186,11 @@ func (p *Phase1Solver) depthFirst(solutions chan<- []Move, c Phase1Cube,
 		cube := c
 		move := Move(m)
 		cube.Move(move, p.moves)
-		if !p.depthFirst(solutions, cube, append(moves, move), depth-1) {
+		moves = append(moves, move)
+		if !p.depthFirst(solutions, cube, moves, depth-1) {
 			return false
 		}
+		moves = moves[:len(moves)-1]
 		if depth >= 7 && p.isStopped() {
 			return false
 		}
