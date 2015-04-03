@@ -124,6 +124,10 @@ func NewPhase1Solver(c Phase1Cube, h *Phase1Heuristic,
 	return res
 }
 
+func (p *Phase1Solver) Solutions() <-chan []Move {
+	return p.solutions
+}
+
 func (p *Phase1Solver) Stop() {
 	close(p.stopped)
 }
