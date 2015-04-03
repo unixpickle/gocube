@@ -5,7 +5,7 @@ import "testing"
 func BenchmarkPhase1Conversion(b *testing.B) {
 	scramble, _ := ParseMoves("L R2 B2 F2 L2 U' B2 F U R2 F' L2 R' B' F2 D2 " +
 		"R U' L' R U2 F2 D U' R2 U B2 F D U")
-	
+
 	// Apply the scramble once and time how long it takes.
 	cube := SolvedCubieCube()
 	for _, move := range scramble {
@@ -14,7 +14,7 @@ func BenchmarkPhase1Conversion(b *testing.B) {
 	for i := 0; i < b.N/2; i++ {
 		cube.Phase1Cube()
 	}
-	
+
 	// Apply the scramble again and time how long it takes on this new cube.
 	for _, move := range scramble {
 		cube.Move(move)
