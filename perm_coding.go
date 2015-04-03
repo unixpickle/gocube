@@ -19,6 +19,34 @@ var pascalsTriangle = [][]int{
 	[]int{1, 12, 66, 220, 495, 792, 924, 792, 495, 220, 66, 12, 1},
 }
 
+func allPermutations(size int) [][]int {
+	if size == 0 {
+		return [][]int{[]int{}}
+	} else if size == 1 {
+		return [][]int{[]int{0}}
+	}
+	
+	result := [][]int{}
+	subPermutations := allPermutations(size - 1)
+	
+	// For every starting element, go through every sub permutation and generate
+	// a new permutation
+	for start := 0; start < size; start++ {
+		for _, subPerm := range subPermutations {
+			perm := append([]int{start}, subPerm...)
+			// Increment values which are >= start
+			for j := 1; j < len(perm); j++ {
+				if perm[j] >= start {
+					perm[j]++
+				}
+			}
+			result = append(result, perm)
+		}
+	}
+	
+	return result
+}
+
 func choose(a, b int) int {
 	if a < 13 {
 		return pascalsTriangle[a][b]
@@ -63,6 +91,38 @@ func encodeExplicitChoice(choice []bool, start, numTrue int) int {
 
 	panic("internal inconsistency in encodeExplicitChoice")
 	return -1
+}
+
+func encodePermutation(perm []int) int {
+	c := make([]int, len(perm))
+	copy(c, perm)
+	return encodePermutationInPlace(c)
+}
+
+func encodePermutationInPlace(perm []int) int {
+	if len(perm) == 0 {
+		return 0
+	}
+	
+	result := 0
+	factorial := factorial(len(perm)-1)
+	
+	for i := 0; i < len(perm)-1; i++ {
+		current := perm[i]
+		
+		// Add the element to the result.
+		result += factorial * current
+		factorial /= len(perm) - i - 1
+		
+		// Shift all the elements which were above the current element.
+		for j := i+1; j < len(perm)-1; j++ {
+			if perm[j] > current {
+				perm[j]--
+			}
+		}
+	}
+	
+	return result
 }
 
 func factorial(n int) int {

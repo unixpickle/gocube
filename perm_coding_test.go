@@ -23,3 +23,15 @@ func TestEncodeChoose(t *testing.T) {
 		}
 	}
 }
+
+func TestEncodePermutation(t *testing.T) {
+	for length := 0; length < 8; length++ {
+		testSet := allPermutations(length)
+		for j := 0; j < len(testSet); j++ {
+			if j != encodePermutation(testSet[j]) {
+				t.Error("Encoded", testSet[j], "expected",
+					j, "but got", encodePermutation(testSet[j]))
+			}
+		}
+	}
+}

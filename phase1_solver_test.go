@@ -101,5 +101,5 @@ func findPhase1Solution(c Phase1Cube, h *Phase1Heuristic,
 	solver := NewPhase1Solver(c, h, m)
 	res := <-solver.Solutions()
 	solver.Stop()
-	return res
+	return res.Moves
 }

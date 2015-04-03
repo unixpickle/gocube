@@ -134,10 +134,16 @@ func (p *Phase1Heuristic) computeEOSlice(moves *Phase1Moves, complete bool) {
 	}
 }
 
+// A Phase1Solution stores information about a phase-1 solution.
+type Phase1Solution struct {
+	Cube  Phase1Cube
+	Moves []Move
+}
+
 // A Phase1Solver finds solutions to a specific phase-1 state.
 type Phase1Solver struct {
 	stopped   chan struct{}
-	solutions <-chan []Move
+	solutions <-chan Phase1Solution
 	
 	heuristic *Phase1Heuristic
 	moves     *Phase1Moves
@@ -146,13 +152,13 @@ type Phase1Solver struct {
 // NewPhase1Solver creates and starts a Phase1Solver.
 func NewPhase1Solver(c Phase1Cube, h *Phase1Heuristic,
 	m *Phase1Moves) *Phase1Solver {
-	solutions := make(chan []Move)
+	solutions := make(chan Phase1Solution)
 	res := &Phase1Solver{make(chan struct{}), solutions, h, m}
 	go res.search(solutions, c)
 	return res
 }
 
-func (p *Phase1Solver) Solutions() <-chan []Move {
+func (p *Phase1Solver) Solutions() <-chan Phase1Solution {
 	return p.solutions
 }
 
@@ -160,7 +166,7 @@ func (p *Phase1Solver) Stop() {
 	close(p.stopped)
 }
 
-func (p *Phase1Solver) depthFirst(solutions chan<- []Move, c Phase1Cube,
+func (p *Phase1Solver) depthFirst(solutions chan<- Phase1Solution, c Phase1Cube,
 	moves []Move, depth int, lastFace int) bool {
 	// If the depth is zero, we may have a solution.
 	if depth == 0 {
@@ -170,7 +176,7 @@ func (p *Phase1Solver) depthFirst(solutions chan<- []Move, c Phase1Cube,
 			select {
 			case <-p.stopped:
 				return false
-			case solutions <- res:
+			case solutions <- Phase1Solution{c, res}:
 			}
 		}
 		return true
@@ -211,7 +217,7 @@ func (p *Phase1Solver) isStopped() bool {
 	}
 }
 
-func (p *Phase1Solver) search(solutions chan<- []Move, c Phase1Cube) {
+func (p *Phase1Solver) search(solutions chan<- Phase1Solution, c Phase1Cube) {
 	depth := 0
 	for {
 		moves := make([]Move, 0, depth)

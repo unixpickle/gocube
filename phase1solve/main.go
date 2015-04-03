@@ -26,6 +26,6 @@ func main() {
 	fmt.Println("Searching...")
 	solver := gocube.NewPhase1Solver(cc.Phase1Cube(), heuristic, moves)
 	for solution := range solver.Solutions() {
-		fmt.Println(solution, "-", len(solution), "moves")
+		fmt.Println(solution.Moves, "-", len(solution.Moves), "moves")
 	}
 }
