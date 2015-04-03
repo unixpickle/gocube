@@ -161,7 +161,7 @@ func (p *Phase1Solver) Stop() {
 }
 
 func (p *Phase1Solver) depthFirst(solutions chan<- []Move, c Phase1Cube,
-	moves []Move, depth int) bool {
+	moves []Move, depth int, lastFace int) bool {
 	// If the depth is zero, we may have a solution.
 	if depth == 0 {
 		if c.AnySolved() {
@@ -183,11 +183,14 @@ func (p *Phase1Solver) depthFirst(solutions chan<- []Move, c Phase1Cube,
 	
 	// Apply every move and recurse.
 	for m := 0; m < 18; m++ {
-		cube := c
 		move := Move(m)
+		if move.Face() == lastFace {
+			continue
+		}
+		cube := c
 		cube.Move(move, p.moves)
 		moves = append(moves, move)
-		if !p.depthFirst(solutions, cube, moves, depth-1) {
+		if !p.depthFirst(solutions, cube, moves, depth-1, move.Face()) {
 			return false
 		}
 		moves = moves[:len(moves)-1]
@@ -212,7 +215,7 @@ func (p *Phase1Solver) search(solutions chan<- []Move, c Phase1Cube) {
 	depth := 0
 	for {
 		moves := make([]Move, 0, depth)
-		if !p.depthFirst(solutions, c, moves, depth) {
+		if !p.depthFirst(solutions, c, moves, depth, 0) {
 			return
 		}
 		depth++
