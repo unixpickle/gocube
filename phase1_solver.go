@@ -28,8 +28,34 @@ func NewPhase1Heuristic(moves *Phase1Moves, complete bool) *Phase1Heuristic {
 // LowerBound returns the minimum number of moves needed to solve at least one
 // axis of a Phase1Cube.
 func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
-	// TODO: implement this function once EO is properly tracked in Phase1Cube.
-	return 0
+	var result int8
+	
+	// Corner orientation heuristic.
+	if r := p.CO[c.XCornerOrientation]; r > result {
+		result = r
+	}
+	if r := p.CO[c.YCornerOrientation]; r > result {
+		result = r
+	}
+	if r := p.CO[c.ZCornerOrientation]; r > result {
+		result = r
+	}
+	
+	// EOSlice heuristic.
+	sliceValues := []int{
+		c.MSlicePermutation*2048 + c.XEdgeOrientation(),
+		c.ESlicePermutation*2048 + c.FBEdgeOrientation,
+		c.SSlicePermutation*2048 + c.UDEdgeOrientation,
+	}
+	for _, eoSlice := range sliceValues {
+		if r := p.EOSlice[eoSlice]; r > result {
+			result = r
+		} else if r < 0 && result < 8 {
+			result = 8
+		}
+	}
+	
+	return int(result)
 }
 
 func (p *Phase1Heuristic) computeCO(moves *Phase1Moves) {
