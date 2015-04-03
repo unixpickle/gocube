@@ -4,18 +4,20 @@
 
 # Design considerations
 
-I don't know the best way to solve the cube on a computer. Thus, I will make this project as modular as possible so that it can be improved easily (unlike [some people's code](https://github.com/lgarron/shuang-chen-projects/blob/dee5de0485d20b6f7759e11b5aef248d9e0f2dda/min2phase-java/src/CoordCube.java#L225))
+I want this code to be efficient. However, I don't claim to know the best way to solve the cube computationally. Thus, I will make this project as modular as possible so that it can be improved easily (unlike [some people's code](https://github.com/lgarron/shuang-chen-projects/blob/dee5de0485d20b6f7759e11b5aef248d9e0f2dda/min2phase-java/src/CoordCube.java#L225)).
 
 # TODO
 
-The following things must be done:
+I am currently working towards a functional two-phase solver which uses Kociemba's algorithm. Here is what must be done:
 
- * Create better corner heuristic for permutation.
- * Implement phase-one solver
-   * Implement corner goal
-   * Create corner heuristic
- * Implement phase-two solver
-   * Create heuristic
+ * Implement phase-2 solver
+   * Phase2Cube which stores corner+edge+slice permutations.
+   * Conversion from CubieCube to Phase2Cube (in a given axis)
+     * Make sure encoding permutations works
+   * Phase2Heuristic
+   * Phase2Solver
+ * Finish two-phase solver as TwoPhaseSolver class.
+   * (Possibly) attempt pre-scramble and inverse solutions.
 
 # License
 
