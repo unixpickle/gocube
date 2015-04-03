@@ -39,6 +39,24 @@ func BenchmarkPhase1Moves(b *testing.B) {
 	}
 }
 
+func BenchmarkPhase1XEdgeOrientation(b *testing.B) {
+	moves := NewPhase1Moves()
+	cube := SolvedPhase1Cube()
+
+	// Apply a scramble to the phase-1 cube.
+	scramble, _ := ParseMoves("L R2 B2 F2 L2 U' B2 F U R2 F' L2 R' B' F2 D2 " +
+		"R U' L' R U2 F2 D U' R2 U B2 F D U")
+	for _, x := range scramble {
+		cube.Move(x, moves)
+	}
+	
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		cube.XEdgeOrientation()
+	}
+}
+
 func TestPhase1Conversion(t *testing.T) {
 	moves := NewPhase1Moves()
 	goodCube := SolvedPhase1Cube()
@@ -124,18 +142,26 @@ func TestPhase1Moves(t *testing.T) {
 
 func TestPhase1XEdgeOrientation(t *testing.T) {
 	moves := NewPhase1Moves()
-	cube := SolvedPhase1Cube()
-
-	// Apply a scramble to the phase-1 cube.
-	scramble, _ := ParseMoves("L R2 B2 F2 L2 U' B2 F U R2 F' L2 R' B' F2 D2 " +
-		"R U' L' R U2 F2 D U' R2 U B2 F D U")
-	for _, x := range scramble {
-		cube.Move(x, moves)
+	
+	scrambles := []string{
+		"L R2 B2 F2 L2 U' B2 F U R2 F' L2 R' B' F2 D2 R U' L' R U2 F2 D U' " +
+			"R2 U B2 F D U",
+		"B F' D U' L D B2 F2 L R2 B2 L2 F' D B' F2 R' B2 F L2 R' D2 U' L' B' " +
+			"R2 B U B L2",
+		"U R2 F B R B2 R U2 L B2 R U' D' R2 F R' L B2 U2 F2",
 	}
-
-	expected := 0x68c
-	if cube.XEdgeOrientation() != expected {
-		t.Error("Invalid XEdgeOrientation. Got", cube.XEdgeOrientation(),
-			"but expected", expected)
+	expectedValues := []int{0x68c, 0xb7, 0x7ff}
+	
+	for i, scramble := range scrambles {
+		expected := expectedValues[i]
+		cube := SolvedPhase1Cube()
+		s, _ := ParseMoves(scramble)
+		for _, x := range s {
+			cube.Move(x, moves)
+		}
+		if cube.XEdgeOrientation() != expected {
+			t.Error("Invalid XEdgeOrientation. Got", cube.XEdgeOrientation(),
+				"but expected", expected)
+		}
 	}
 }

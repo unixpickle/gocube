@@ -111,19 +111,24 @@ func (p *Phase1Cube) Solved() (x bool, y bool, z bool) {
 func (p *Phase1Cube) XEdgeOrientation() int {
 	res := 0
 
-	// Compute the full EO bitmap, setting the last bit according to parity.
-	fbEO := p.FBEdgeOrientation
-	for i := uint(0); i < 11; i++ {
-		if (fbEO & (1 << i)) != 0 {
-			fbEO ^= 0x800
+	// Translate the EO bitmap, noting that xEdgeIndices[10] is 11 and is thus
+	// never set in the FB bitmap.
+	parity := false
+	for i, idx := range xEdgeIndices[:10] {
+		if (p.FBEdgeOrientation & (1 << uint(idx))) != 0 {
+			res |= 1 << uint(i)
+			parity = !parity
 		}
 	}
-
-	// Translate the EO bitmap.
-	for i, idx := range xEdgeIndices[:11] {
-		if (fbEO & (1 << uint(idx))) != 0 {
-			res |= 1 << uint(i)
-		}
+	
+	// If the last thing in the translated bitmap would be a 1, flip the parity.
+	if (p.FBEdgeOrientation & (1 << uint(xEdgeIndices[11]))) != 0 {
+		parity = !parity
+	}
+	
+	// If there is parity, then the missing element (i.e. #10) is 1.
+	if parity {
+		res |= 1 << 10
 	}
 
 	return res
