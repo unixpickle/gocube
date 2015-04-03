@@ -136,12 +136,12 @@ func (p *Phase1Cube) XEdgeOrientation() int {
 			parity = !parity
 		}
 	}
-	
+
 	// If the last thing in the translated bitmap would be a 1, flip the parity.
 	if (p.FBEdgeOrientation & (1 << uint(xEdgeIndices[11]))) != 0 {
 		parity = !parity
 	}
-	
+
 	// If there is parity, then the missing element (i.e. #10) is 1.
 	if parity {
 		res |= 1 << 10

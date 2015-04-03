@@ -25,10 +25,10 @@ func allPermutations(size int) [][]int {
 	} else if size == 1 {
 		return [][]int{[]int{0}}
 	}
-	
+
 	result := [][]int{}
 	subPermutations := allPermutations(size - 1)
-	
+
 	// For every starting element, go through every sub permutation and generate
 	// a new permutation
 	for start := 0; start < size; start++ {
@@ -43,7 +43,7 @@ func allPermutations(size int) [][]int {
 			result = append(result, perm)
 		}
 	}
-	
+
 	return result
 }
 
@@ -103,25 +103,25 @@ func encodePermutationInPlace(perm []int) int {
 	if len(perm) == 0 {
 		return 0
 	}
-	
+
 	result := 0
-	factorial := factorial(len(perm)-1)
-	
+	factorial := factorial(len(perm) - 1)
+
 	for i := 0; i < len(perm)-1; i++ {
 		current := perm[i]
-		
+
 		// Add the element to the result.
 		result += factorial * current
 		factorial /= len(perm) - i - 1
-		
+
 		// Shift all the elements which were above the current element.
-		for j := i+1; j < len(perm)-1; j++ {
+		for j := i + 1; j < len(perm)-1; j++ {
 			if perm[j] > current {
 				perm[j]--
 			}
 		}
 	}
-	
+
 	return result
 }
 

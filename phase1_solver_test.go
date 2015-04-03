@@ -24,9 +24,9 @@ func BenchmarkNewPhase1HeuristicIncomplete(b *testing.B) {
 func BenchmarkPhase1Solver(b *testing.B) {
 	moves := NewPhase1Moves()
 	heuristic := NewPhase1Heuristic(moves, false)
-	
+
 	b.ResetTimer()
-	
+
 	// Do random move sequences and solve each one.
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
@@ -42,7 +42,7 @@ func BenchmarkPhase1Solver(b *testing.B) {
 func TestPhase1Heuristic(t *testing.T) {
 	table := NewPhase1Moves()
 	heuristic := NewPhase1Heuristic(table, false)
-	
+
 	// Do random move sequences and ensure that the lower bound is never too
 	// high.
 	for length := 1; length < 12; length++ {
@@ -65,7 +65,7 @@ func TestPhase1Heuristic(t *testing.T) {
 func TestPhase1Solver(t *testing.T) {
 	table := NewPhase1Moves()
 	heuristic := NewPhase1Heuristic(table, false)
-	
+
 	// Do a bunch of random move sequences and make sure a solution is found.
 	for length := 1; length < 12; length++ {
 		for i := 0; i < 50; i++ {
@@ -77,13 +77,13 @@ func TestPhase1Solver(t *testing.T) {
 				moves[j] = move
 			}
 			solution := findPhase1Solution(cube, heuristic, table)
-			
+
 			// Make sure the solution is short enough.
 			if len(solution) > len(moves) {
 				t.Error("Solution is too long:", solution, "for scramble",
 					moves)
 			}
-			
+
 			// Make sure the solution actually works.
 			for _, m := range solution {
 				cube.Move(m, table)

@@ -49,7 +49,7 @@ func BenchmarkPhase1XEdgeOrientation(b *testing.B) {
 	for _, x := range scramble {
 		cube.Move(x, moves)
 	}
-	
+
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
@@ -142,7 +142,7 @@ func TestPhase1Moves(t *testing.T) {
 
 func TestPhase1XEdgeOrientation(t *testing.T) {
 	moves := NewPhase1Moves()
-	
+
 	scrambles := []string{
 		"L R2 B2 F2 L2 U' B2 F U R2 F' L2 R' B' F2 D2 R U' L' R U2 F2 D U' " +
 			"R2 U B2 F D U",
@@ -151,7 +151,7 @@ func TestPhase1XEdgeOrientation(t *testing.T) {
 		"U R2 F B R B2 R U2 L B2 R U' D' R2 F R' L B2 U2 F2",
 	}
 	expectedValues := []int{0x68c, 0xb7, 0x7ff}
-	
+
 	for i, scramble := range scrambles {
 		expected := expectedValues[i]
 		cube := SolvedPhase1Cube()

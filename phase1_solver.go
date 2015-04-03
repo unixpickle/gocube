@@ -29,7 +29,7 @@ func NewPhase1Heuristic(moves *Phase1Moves, complete bool) *Phase1Heuristic {
 // phase-1 axes at once.
 func (p *Phase1Heuristic) AllLowerBound(c *Phase1Cube) int {
 	var result int8
-	
+
 	// Corner orientation heuristic.
 	if r := p.CO[c.XCornerOrientation]; r > result {
 		result = r
@@ -40,7 +40,7 @@ func (p *Phase1Heuristic) AllLowerBound(c *Phase1Cube) int {
 	if r := p.CO[c.ZCornerOrientation]; r > result {
 		result = r
 	}
-	
+
 	// EOSlice heuristic.
 	sliceValues := []int{
 		c.MSlicePermutation*2048 + c.XEdgeOrientation(),
@@ -54,7 +54,7 @@ func (p *Phase1Heuristic) AllLowerBound(c *Phase1Cube) int {
 			result = 8
 		}
 	}
-	
+
 	return int(result)
 }
 
@@ -62,7 +62,7 @@ func (p *Phase1Heuristic) AllLowerBound(c *Phase1Cube) int {
 // phase-1 axis.
 func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
 	finalResult := int8(127)
-	
+
 	sliceValues := []int{
 		c.MSlicePermutation*2048 + c.XEdgeOrientation(),
 		c.ESlicePermutation*2048 + c.FBEdgeOrientation,
@@ -70,7 +70,7 @@ func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
 	}
 	coValues := []int{c.XCornerOrientation, c.YCornerOrientation,
 		c.ZCornerOrientation}
-	
+
 	for axis := 0; axis < 3; axis++ {
 		result := p.CO[coValues[axis]]
 		if r := p.EOSlice[sliceValues[axis]]; r > result {
@@ -82,7 +82,7 @@ func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
 			finalResult = result
 		}
 	}
-	
+
 	return int(finalResult)
 }
 
@@ -144,7 +144,7 @@ type Phase1Solution struct {
 type Phase1Solver struct {
 	stopped   chan struct{}
 	solutions <-chan Phase1Solution
-	
+
 	heuristic *Phase1Heuristic
 	moves     *Phase1Moves
 }
@@ -181,12 +181,12 @@ func (p *Phase1Solver) depthFirst(solutions chan<- Phase1Solution, c Phase1Cube,
 		}
 		return true
 	}
-	
+
 	// Check the heuristic.
 	if p.heuristic.LowerBound(&c) > depth {
 		return true
 	}
-	
+
 	// Apply every move and recurse.
 	for m := 0; m < 18; m++ {
 		move := Move(m)
@@ -204,7 +204,7 @@ func (p *Phase1Solver) depthFirst(solutions chan<- Phase1Solution, c Phase1Cube,
 			return false
 		}
 	}
-	
+
 	return true
 }
 
