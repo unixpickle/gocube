@@ -106,6 +106,29 @@ func (p *Phase1Cube) Solved() (x bool, y bool, z bool) {
 	return
 }
 
+// XEdgeOrientation returns the FBEdgeOrientation, translated for the X axis
+// cube.
+func (p *Phase1Cube) XEdgeOrientation() int {
+	res := 0
+
+	// Compute the full EO bitmap, setting the last bit according to parity.
+	fbEO := p.FBEdgeOrientation
+	for i := uint(0); i < 11; i++ {
+		if (fbEO & (1 << i)) != 0 {
+			fbEO ^= 0x800
+		}
+	}
+
+	// Translate the EO bitmap.
+	for i, idx := range xEdgeIndices[:11] {
+		if (fbEO & (1 << uint(idx))) != 0 {
+			res |= 1 << uint(i)
+		}
+	}
+
+	return res
+}
+
 // Phase1Moves is a table containing the necessary data to efficiently perform
 // moves on a Phase1Cube.
 // Note that only one move table is needed for all 3 axes (i.e. all three

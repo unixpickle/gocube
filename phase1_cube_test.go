@@ -121,3 +121,21 @@ func TestPhase1Moves(t *testing.T) {
 		t.Error("Incorrect CO: Expected", goalCO, "got", co)
 	}
 }
+
+func TestPhase1XEdgeOrientation(t *testing.T) {
+	moves := NewPhase1Moves()
+	cube := SolvedPhase1Cube()
+
+	// Apply a scramble to the phase-1 cube.
+	scramble, _ := ParseMoves("L R2 B2 F2 L2 U' B2 F U R2 F' L2 R' B' F2 D2 " +
+		"R U' L' R U2 F2 D U' R2 U B2 F D U")
+	for _, x := range scramble {
+		cube.Move(x, moves)
+	}
+
+	expected := 0x68c
+	if cube.XEdgeOrientation() != expected {
+		t.Error("Invalid XEdgeOrientation. Got", cube.XEdgeOrientation(),
+			"but expected", expected)
+	}
+}
