@@ -1,5 +1,7 @@
 package gocube
 
+import "errors"
+
 // inverseXCornerIndices is the inverse permutation of xCornerIndices.
 var inverseXCornerIndices []int = []int{2, 0, 3, 1, 6, 4, 7, 5}
 
@@ -27,13 +29,21 @@ func NewPhase2Cube(c CubieCube, axis int) (Phase2Cube, error) {
 	var res Phase2Cube
 	if axis == 0 {
 		res.CornerPermutation = encodeXCornerPerm(&c.Corners)
+		res.EdgePermutation = encodeRLEdges(&c.Edges)
 		res.SlicePermutation = encodeMSlicePerm(&c.Edges)
 	} else if axis == 1 {
 		res.CornerPermutation = encodeYCornerPerm(&c.Corners)
+		res.EdgePermutation = encodeUDEdges(&c.Edges)
 		res.SlicePermutation = encodeESlicePerm(&c.Edges)
 	} else {
 		res.CornerPermutation = encodeZCornerPerm(&c.Corners)
+		res.EdgePermutation = encodeFBEdges(&c.Edges)
 		res.SlicePermutation = encodeSSlicePerm(&c.Edges)
+	}
+	if res.EdgePermutation < 0 {
+		return res, errors.New("invalid edge permutation")
+	} else if res.SlicePermutation < 0 {
+		return res, errors.New("invalid slice permutation")
 	}
 	return res, nil
 }
@@ -55,8 +65,15 @@ func encodeESlicePerm(e *CubieEdges) int {
 }
 
 func encodeFBEdges(e *CubieEdges) int {
-	// TODO: implement this.
-	return -1
+	var perm [8]int
+	for i, slot := range []int{0, 1, 2, 3, 6, 7, 8, 9} {
+		piece := (*e)[slot].Piece
+		perm[i] = []int{0, 1, 2, 3, -1, -1, 4, 5, 6, 7, -1, -1}[piece]
+		if perm[i] < 0 {
+			return -1
+		}
+	}
+	return encodePermutationInPlace(perm[:])
 }
 
 func encodeMSlicePerm(e *CubieEdges) int {
@@ -75,8 +92,15 @@ func encodeMSlicePerm(e *CubieEdges) int {
 }
 
 func encodeRLEdges(e *CubieEdges) int {
-	// TODO: implement this.
-	return -1
+	var perm [8]int
+	for i, slot := range []int{9, 4, 3, 10, 7, 5, 1, 11} {
+		piece := (*e)[slot].Piece
+		perm[i] = []int{-1, 6, -1, 2, 1, 5, -1, 4, -1, 0, 3, 7}[piece]
+		if perm[i] < 0 {
+			return -1
+		}
+	}
+	return encodePermutationInPlace(perm[:])
 }
 
 func encodeSSlicePerm(e *CubieEdges) int {
@@ -95,8 +119,15 @@ func encodeSSlicePerm(e *CubieEdges) int {
 }
 
 func encodeUDEdges(e *CubieEdges) int {
-	// TODO: implement this.
-	return -1
+	var perm [8]int
+	for i, slot := range []int{6, 5, 0, 4, 8, 11, 2, 10} {
+		piece := (*e)[slot].Piece
+		perm[i] = []int{2, -1, 6, -1, 3, 1, 0, -1, 4, -1, 7, 5}[piece]
+		if perm[i] < 0 {
+			return -1
+		}
+	}
+	return encodePermutationInPlace(perm[:])
 }
 
 func encodeXCornerPerm(c *CubieCorners) int {
