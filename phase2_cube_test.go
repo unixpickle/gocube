@@ -3,11 +3,17 @@ package gocube
 import "testing"
 
 func TestNewPhase2Cube(t *testing.T) {
+	// I did the same scramble, translated for all three directions. It seems to
+	// work for all of them.
 	scrambles := []string{
 		"R2 U F2 D2 L2 D' B2 R2 L2 D2 U' F2 D R2 U R2 D2",
+		"U2 L F2 R2 D2 R' B2 U2 D2 R2 L' F2 R U2 L U2 R2",
+		"R2 F D2 B2 L2 B' U2 R2 L2 B2 F' D2 B R2 F R2 B2",
 	}
-	axes := []int{1}
+	axes := []int{1, 0, 2}
 	states := []Phase2Cube{
+		Phase2Cube{29024, 14092, 2},
+		Phase2Cube{29024, 14092, 2},
 		Phase2Cube{29024, 14092, 2},
 	}
 	
@@ -20,11 +26,24 @@ func TestNewPhase2Cube(t *testing.T) {
 		}
 		p2cube, err := NewPhase2Cube(cube, axes[i])
 		if err != nil {
-			t.Error("state", i, "error:", err)
+			t.Error("For moves", s, "got error:", err)
 			continue
 		}
 		if p2cube != state {
 			t.Error("For moves", s, "expected", state, "got", p2cube)
+		}
+	}
+	
+	// Make sure that an error occurs if the thing is wrong.
+	normalCube := SolvedCubieCube()
+	moves, _ := ParseMoves("U2 L2 D U B' U2 B' R2 F2 L D2 L' B F2 L B' L' R")
+	for _, m := range moves {
+		normalCube.Move(m)
+	}
+	for axis := 0; axis < 3; axis++ {
+		result, err := NewPhase2Cube(normalCube, axis)
+		if err == nil {
+			t.Error("Expected error but got", result)
 		}
 	}
 }
