@@ -74,7 +74,7 @@ type Phase2Move int
 // Face returns a number from [1, 6] corresponding to the face of the move if it
 // were applied on the Y axis.
 func (p Phase2Move) Face() int {
-	return []int{2, 3, 4, 5, 0, 0, 0, 1, 1, 1}[int(p)]
+	return []int{2, 3, 4, 5, 0, 0, 0, 1, 1, 1}[int(p)] + 1
 }
 
 // Inverse returns the move's inverse.
@@ -91,6 +91,11 @@ func (p Phase2Move) Move(axis int) Move {
 		[]Move{14, 15, 16, 17, 0, 6, 12, 1, 7, 13},
 		[]Move{12, 13, 16, 17, 3, 9, 15, 2, 8, 14},
 	}[axis][int(p)]
+}
+
+// String returns the string representation of the move on the Y axis.
+func (p Phase2Move) String() string {
+	return p.Move(1).String()
 }
 
 // Phase2Moves is a table containing the necessary data to efficiently perform

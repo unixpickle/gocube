@@ -67,7 +67,7 @@ func TestPhase1Solver(t *testing.T) {
 	heuristic := NewPhase1Heuristic(table, false)
 
 	// Do a bunch of random move sequences and make sure a solution is found.
-	for length := 1; length < 12; length++ {
+	for length := 1; length <= 12; length++ {
 		for i := 0; i < 50; i++ {
 			cube := SolvedPhase1Cube()
 			moves := make([]Move, length)

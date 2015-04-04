@@ -3,28 +3,49 @@ package gocube
 // A Phase2Heuristic estimates a lower bound for the number of moves to solve a
 // Phase2Cube.
 type Phase2Heuristic struct {
-	Corners [40320]int8
+	CornersSlice [967680]int8
+	EdgesSlice   [967680]int8
 }
 
 // NewPhase2Heuristic generates a Phase2Heuristic.
 func NewPhase2Heuristic(moves *Phase2Moves) *Phase2Heuristic {
 	res := new(Phase2Heuristic)
 
-	// Generate the corners.
-	for i := 0; i < 40320; i++ {
-		res.Corners[i] = -1
+	// Make all the move counts -1 by default.
+	for i := 0; i < 967680; i++ {
+		res.CornersSlice[i] = -1
+		res.EdgesSlice[i] = -1
 	}
-	nodes := []phase2CornerNode{phase2CornerNode{0, 0}}
+	
+	// Generate CornersSlice
+	nodes := []phase2Node{phase2Node{0, 0, 0}}
 	for len(nodes) > 0 {
 		node := nodes[0]
 		nodes = nodes[1:]
-		if res.Corners[node.corners] >= 0 {
+		if res.CornersSlice[node.hash()] >= 0 {
 			continue
 		}
-		res.Corners[node.corners] = node.depth
+		res.CornersSlice[node.hash()] = node.depth
 		for m := 0; m < 10; m++ {
-			state := moves.CornerMoves[node.corners][m]
-			nodes = append(nodes, phase2CornerNode{state, node.depth + 1})
+			p4 := moves.SliceMoves[node.perm4][m]
+			p8 := moves.CornerMoves[node.perm8][m]
+			nodes = append(nodes, phase2Node{p4, p8, node.depth + 1})
+		}
+	}
+	
+	// Generate EdgesSlice
+	nodes = []phase2Node{phase2Node{0, 0, 0}}
+	for len(nodes) > 0 {
+		node := nodes[0]
+		nodes = nodes[1:]
+		if res.EdgesSlice[node.hash()] >= 0 {
+			continue
+		}
+		res.EdgesSlice[node.hash()] = node.depth
+		for m := 0; m < 10; m++ {
+			p4 := moves.SliceMoves[node.perm4][m]
+			p8 := moves.EdgeMoves[node.perm8][m]
+			nodes = append(nodes, phase2Node{p4, p8, node.depth + 1})
 		}
 	}
 
@@ -33,21 +54,31 @@ func NewPhase2Heuristic(moves *Phase2Moves) *Phase2Heuristic {
 
 // LowerBound returns the heuristic lower bound for a given Phase2Cube.
 func (p *Phase2Heuristic) LowerBound(c *Phase2Cube) int {
-	return int(p.Corners[c.CornerPermutation])
+	cornersSlice := c.CornerPermutation*24 + c.SlicePermutation
+	edgesSlice := c.EdgePermutation*24 + c.SlicePermutation
+	cMoves := p.CornersSlice[cornersSlice]
+	eMoves := p.EdgesSlice[edgesSlice]
+	if eMoves > cMoves {
+		return int(eMoves)
+	} else {
+		return int(cMoves)
+	}
 }
 
 // SolvePhase2 finds the first solution to a Phase2Cube, or gives up after
 // maxLen moves.
-func SolvePhase2(cube Phase2Cube, maxLen int, moves *Phase2Moves,
-	heuristic *Phase2Heuristic) []Phase2Move {
+func SolvePhase2(cube Phase2Cube, maxLen int, heuristic *Phase2Heuristic,
+	moves *Phase2Moves) []Phase2Move {
 	for depth := 0; depth <= maxLen; depth++ {
-		return depthFirstPhase2(cube, depth, moves, heuristic, 0)
+		if x := depthFirstPhase2(cube, depth, heuristic, moves, 0); x != nil {
+			return x
+		}
 	}
 	return nil
 }
 
-func depthFirstPhase2(cube Phase2Cube, depth int, moves *Phase2Moves,
-	heuristic *Phase2Heuristic, lastFace int) []Phase2Move {
+func depthFirstPhase2(cube Phase2Cube, depth int, heuristic *Phase2Heuristic,
+	moves *Phase2Moves, lastFace int) []Phase2Move {
 	if depth == 0 {
 		if cube.Solved() {
 			return []Phase2Move{}
@@ -64,7 +95,7 @@ func depthFirstPhase2(cube Phase2Cube, depth int, moves *Phase2Moves,
 		}
 		c := cube
 		c.Move(m, moves)
-		res := depthFirstPhase2(c, depth-1, moves, heuristic, m.Face())
+		res := depthFirstPhase2(c, depth-1, heuristic, moves, m.Face())
 		if res != nil {
 			return append([]Phase2Move{m}, res...)
 		}
@@ -73,7 +104,12 @@ func depthFirstPhase2(cube Phase2Cube, depth int, moves *Phase2Moves,
 	return nil
 }
 
-type phase2CornerNode struct {
-	corners int
-	depth   int8
+type phase2Node struct {
+	perm4 int
+	perm8 int
+	depth int8
+}
+
+func (n *phase2Node) hash() int {
+	return n.perm8*24 + n.perm4
 }
