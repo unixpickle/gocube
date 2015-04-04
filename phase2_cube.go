@@ -87,9 +87,9 @@ func (p Phase2Move) Inverse() Phase2Move {
 // axis of the corresponding Phase2Cube). This is a number in [0, 3).
 func (p Phase2Move) Move(axis int) Move {
 	return [][]Move{
-		[]Move{14, 15, 12, 13, 5, 11, 17, 4, 10, 16},
+		[]Move{14, 15, 13, 12, 4, 10, 16, 5, 11, 17},
 		[]Move{14, 15, 16, 17, 0, 6, 12, 1, 7, 13},
-		[]Move{12, 13, 16, 17, 3, 9, 15, 2, 8, 14},
+		[]Move{13, 12, 16, 17, 2, 8, 14, 3, 9, 15},
 	}[axis][int(p)]
 }
 

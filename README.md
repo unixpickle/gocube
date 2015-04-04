@@ -1,23 +1,14 @@
 # gocube
 
-**gocube** will be a pure Go library for solving the 3x3x3 Rubik's cube and various parts of it.
+**gocube** is a pure Go library for solving the 3x3x3 Rubik's cube.
+
+# Usage
+
+Some general documentation of the API can be found on the [GoDoc](http://godoc.org/github.com/unixpickle/gocube)
 
 # Design considerations
 
 I want this code to be efficient. However, I don't claim to know the best way to solve the cube computationally. Thus, I will make this project as modular as possible so that it can be improved easily (unlike [some people's code](https://github.com/lgarron/shuang-chen-projects/blob/dee5de0485d20b6f7759e11b5aef248d9e0f2dda/min2phase-java/src/CoordCube.java#L225)).
-
-# TODO
-
-I am currently working towards a functional two-phase solver which uses Kociemba's algorithm. Here is what must be done:
-
- * Implement phase-2 solver
-   * Phase2Cube which stores corner+edge+slice permutations.
-   * Conversion from CubieCube to Phase2Cube (in a given axis)
-     * Make sure encoding permutations works
-   * Phase2Heuristic
-   * Phase2Solver
- * Finish two-phase solver as TwoPhaseSolver class.
-   * (Possibly) attempt pre-scramble and inverse solutions.
 
 # License
 
