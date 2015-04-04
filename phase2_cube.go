@@ -53,6 +53,41 @@ func SolvedPhase2Cube() Phase2Cube {
 	return Phase2Cube{}
 }
 
+// Phase2Move represents a move which can be applied to a Phase2Cube. This is a
+// number in the range [0, 10), corresponding to F2 B2 R2 L2 U U' U2 D D' D2
+// respectively.
+type Phase2Move int
+
+// Move converts the Phase2Move into a regular Move.
+// The axis argument indicates the axis that the move should act on (i.e. the
+// axis of the corresponding Phase2Cube). This is a number in [0, 3).
+func (p Phase2Move) Move(axis int) Move {
+	return [][]Move{
+		[]Move{14, 15, 12, 13, 5, 11, 17, 4, 10, 16},
+		[]Move{14, 15, 16, 17, 0, 6, 12, 1, 7, 13},
+		[]Move{12, 13, 16, 17, 3, 9, 15, 2, 8, 14},
+	}[axis][int(p)]
+}
+
+// Phase2Moves is a table containing the necessary data to efficiently perform
+// moves on a Phase2Cube.
+type Phase2Moves struct {
+	CornerMoves [40320][10]int
+	EdgeMoves   [40320][10]int
+	SliceMoves  [24][10]int
+}
+
+// NewPhase2Moves generates a Phase2Moves table.
+func NewPhase2Moves() *Phase2Moves {
+	res := new(Phase2Moves)
+	
+	// TODO: generate corner moves
+	// TODO: generate edge moves
+	// TODO: generate slice moves
+	
+	return res
+}
+
 func encodeESlicePerm(e *CubieEdges) int {
 	// Generate a permutation of {0, 1, 2, 3} that represents the permutation of
 	// the E slice.
