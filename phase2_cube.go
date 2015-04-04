@@ -71,6 +71,11 @@ func (p *Phase2Cube) Solved() bool {
 // respectively.
 type Phase2Move int
 
+// Inverse returns the move's inverse.
+func (p Phase2Move) Inverse() Phase2Move {
+	return []Phase2Move{0, 1, 2, 3, 5, 4, 6, 8, 7, 9}[int(p)]
+}
+
 // Move converts the Phase2Move into a regular Move.
 // The axis argument indicates the axis that the move should act on (i.e. the
 // axis of the corresponding Phase2Cube). This is a number in [0, 3).
@@ -97,6 +102,12 @@ func NewPhase2Moves() *Phase2Moves {
 	perm8 := allPermutations(8)
 
 	// Generate corner cases.
+	for i := 0; i < 40320; i++ {
+		for j := 0; j < 10; j++ {
+			res.CornerMoves[i][j] = -1
+			res.EdgeMoves[i][j] = -1
+		}
+	}
 	for state, perm := range perm8 {
 		corners := SolvedCubieCorners()
 		// Permute the UD edges for the current case.
@@ -105,9 +116,21 @@ func NewPhase2Moves() *Phase2Moves {
 		}
 		// Apply all 10 moves to the cube.
 		for m := 0; m < 10; m++ {
+			// The result of this move may have already been computed as an
+			// inverse.
+			if res.CornerMoves[state][m] >= 0 {
+				continue
+			}
+			
+			// Record the end state of this move.
 			c := corners
 			c.Move(Phase2Move(m).Move(1))
-			res.CornerMoves[state][m] = encodeYCornerPerm(&c)
+			endState := encodeYCornerPerm(&c)
+			res.CornerMoves[state][m] = endState
+			
+			// For the end state, the inverse of this move gets the current
+			// state.
+			res.CornerMoves[endState][int(Phase2Move(m).Inverse())] = state
 		}
 	}
 
@@ -122,9 +145,21 @@ func NewPhase2Moves() *Phase2Moves {
 		}
 		// Apply all 10 moves to the cube.
 		for m := 0; m < 10; m++ {
+			// The result of this move may have already been computed as an
+			// inverse.
+			if res.EdgeMoves[state][m] >= 0 {
+				continue
+			}
+			
+			// Record the end state of this move.
 			e := edges
 			e.Move(Phase2Move(m).Move(1))
-			res.EdgeMoves[state][m] = encodeUDEdges(&e)
+			endState := encodeUDEdges(&e)
+			res.EdgeMoves[state][m] = endState
+			
+			// For the end state, the inverse of this move gets the current
+			// state.
+			res.EdgeMoves[endState][int(Phase2Move(m).Inverse())] = state
 		}
 	}
 

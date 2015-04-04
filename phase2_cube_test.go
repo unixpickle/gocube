@@ -28,6 +28,12 @@ func BenchmarkNewPhase2Cube(b *testing.B) {
 	}
 }
 
+func BenchmarkNewPhase2Moves(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewPhase2Moves()
+	}
+}
+
 func TestNewPhase2Cube(t *testing.T) {
 	// I did the same scramble, translated for all three directions. It seems to
 	// work for all of them.
@@ -84,7 +90,7 @@ func TestPhase2Moves(t *testing.T) {
 	}
 	c := Phase2Cube{29024, 14092, 2}
 	if state != c {
-		t.Error("Invalid state", state, "after doing R2 U F2 D2 L2 D' B2 " +
+		t.Error("Invalid state", state, "after doing R2 U F2 D2 L2 D' B2 "+
 			"R2 L2 D2 U' F2 D R2 U R2 D2")
 	}
 }
