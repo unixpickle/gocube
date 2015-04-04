@@ -2,6 +2,17 @@ package gocube
 
 import "testing"
 
+func BenchmarkEncodePermutationInPlace(b *testing.B) {
+	perms := allPermutations(8)
+	for i := 0; i < b.N/len(perms); i++ {
+		for _, p := range perms {
+			var array [8]int
+			copy(array[:], p)
+			encodePermutationInPlace(array[:])
+		}
+	}
+}
+
 func TestEncodeChoose(t *testing.T) {
 	answer := 0
 	for i := 0; i < 12; i++ {
@@ -14,8 +25,7 @@ func TestEncodeChoose(t *testing.T) {
 					perm[k] = true
 					perm[l] = true
 					if answer != encodeChoice(perm) {
-						t.Error("Expected", answer, "got",
-							encodeChoice(perm))
+						t.Error("Expected", answer, "got", encodeChoice(perm))
 					}
 					answer++
 				}

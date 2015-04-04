@@ -2,6 +2,32 @@ package gocube
 
 import "testing"
 
+func BenchmarkNewPhase2Cube(b *testing.B) {
+	scramble, _ := ParseMoves("U2 L F2 R2 D2 R' B2 U2 D2 R2 L' F2 R U2 L U2 R2")
+	cube := SolvedCubieCube()
+	for _, m := range scramble {
+		cube.Move(m)
+	}
+	b.ResetTimer()
+
+	// Do half the calls on the first cube.
+	for i := 0; i < b.N/2; i++ {
+		NewPhase2Cube(cube, 0)
+	}
+
+	// Apply some moves to get a different state
+	cube.Move(scramble[0])
+	cube.Move(scramble[1])
+	cube.Move(scramble[2])
+	cube.Move(scramble[5])
+	cube.Move(scramble[4])
+	cube.Move(scramble[3])
+
+	for i := 0; i < b.N/2; i++ {
+		NewPhase2Cube(cube, 0)
+	}
+}
+
 func TestNewPhase2Cube(t *testing.T) {
 	// I did the same scramble, translated for all three directions. It seems to
 	// work for all of them.
@@ -16,7 +42,7 @@ func TestNewPhase2Cube(t *testing.T) {
 		Phase2Cube{29024, 14092, 2},
 		Phase2Cube{29024, 14092, 2},
 	}
-	
+
 	for i, s := range scrambles {
 		scramble, _ := ParseMoves(s)
 		state := states[i]
@@ -33,7 +59,7 @@ func TestNewPhase2Cube(t *testing.T) {
 			t.Error("For moves", s, "expected", state, "got", p2cube)
 		}
 	}
-	
+
 	// Make sure that an error occurs if the thing is wrong.
 	normalCube := SolvedCubieCube()
 	moves, _ := ParseMoves("U2 L2 D U B' U2 B' R2 F2 L D2 L' B F2 L B' L' R")

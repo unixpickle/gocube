@@ -104,18 +104,19 @@ func encodePermutationInPlace(perm []int) int {
 		return 0
 	}
 
+	count := len(perm) - 1
 	result := 0
-	factorial := factorial(len(perm) - 1)
+	factorial := factorial(count)
 
-	for i := 0; i < len(perm)-1; i++ {
+	for i := 0; i < count; i++ {
 		current := perm[i]
 
 		// Add the element to the result.
 		result += factorial * current
-		factorial /= len(perm) - i - 1
+		factorial /= count - i
 
 		// Shift all the elements which were above the current element.
-		for j := i + 1; j < len(perm)-1; j++ {
+		for j := i + 1; j < count; j++ {
 			if perm[j] > current {
 				perm[j]--
 			}
