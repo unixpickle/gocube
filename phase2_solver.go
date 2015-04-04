@@ -24,6 +24,7 @@ func NewPhase2Heuristic(moves *Phase2Moves, complete bool) *Phase2Heuristic {
 
 	// Generate CornersSlice
 	nodes := []phase2Node{phase2Node{0, 0, 0}}
+	visited := make([]bool, 967680)
 	for len(nodes) > 0 {
 		node := nodes[0]
 		nodes = nodes[1:]
@@ -37,12 +38,19 @@ func NewPhase2Heuristic(moves *Phase2Moves, complete bool) *Phase2Heuristic {
 		for m := 0; m < 10; m++ {
 			p4 := moves.SliceMoves[node.perm4][m]
 			p8 := moves.CornerMoves[node.perm8][m]
-			nodes = append(nodes, phase2Node{p4, p8, node.depth + 1})
+			newNode := phase2Node{p4, p8, node.depth + 1}
+			if visited[newNode.hash()] {
+				continue
+			} else {
+				visited[newNode.hash()] = true
+			}
+			nodes = append(nodes, newNode)
 		}
 	}
 
 	// Generate EdgesSlice
 	nodes = []phase2Node{phase2Node{0, 0, 0}}
+	visited = make([]bool, 967680)
 	for len(nodes) > 0 {
 		node := nodes[0]
 		nodes = nodes[1:]
@@ -56,7 +64,13 @@ func NewPhase2Heuristic(moves *Phase2Moves, complete bool) *Phase2Heuristic {
 		for m := 0; m < 10; m++ {
 			p4 := moves.SliceMoves[node.perm4][m]
 			p8 := moves.EdgeMoves[node.perm8][m]
-			nodes = append(nodes, phase2Node{p4, p8, node.depth + 1})
+			newNode := phase2Node{p4, p8, node.depth + 1}
+			if visited[newNode.hash()] {
+				continue
+			} else {
+				visited[newNode.hash()] = true
+			}
+			nodes = append(nodes, newNode)
 		}
 	}
 

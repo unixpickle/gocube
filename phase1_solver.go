@@ -110,6 +110,7 @@ func (p *Phase1Heuristic) computeEOSlice(moves *Phase1Moves, complete bool) {
 		p.EOSlice[i] = -1
 	}
 	nodes := []phase1EOSliceNode{phase1EOSliceNode{0, 220, 0}}
+	visited := make([]bool, 1013760)
 	for len(nodes) > 0 {
 		node := nodes[0]
 		nodes = nodes[1:]
@@ -128,8 +129,12 @@ func (p *Phase1Heuristic) computeEOSlice(moves *Phase1Moves, complete bool) {
 		for move := 0; move < 18; move++ {
 			newEO := moves.EOMoves[node.eo][move]
 			newSlice := moves.ESliceMoves[node.slice][move]
-			node := phase1EOSliceNode{newEO, newSlice, node.depth + 1}
-			nodes = append(nodes, node)
+			newHash := newSlice*2048 + newEO
+			if !visited[newHash] {
+				newNode := phase1EOSliceNode{newEO, newSlice, node.depth + 1}
+				nodes = append(nodes, newNode)
+				visited[newHash] = true
+			}
 		}
 	}
 }
