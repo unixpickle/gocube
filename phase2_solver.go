@@ -3,12 +3,17 @@ package gocube
 // A Phase2Heuristic estimates a lower bound for the number of moves to solve a
 // Phase2Cube.
 type Phase2Heuristic struct {
+	// If an element is -1, it should be assumed to have the value 12.
 	CornersSlice [967680]int8
-	EdgesSlice   [967680]int8
+
+	// If an element is -1, it should be assumed to have the value 9.
+	EdgesSlice [967680]int8
 }
 
 // NewPhase2Heuristic generates a Phase2Heuristic.
-func NewPhase2Heuristic(moves *Phase2Moves) *Phase2Heuristic {
+// If complete is true, the full index is found. Otherwise, corners will only
+// be searched up to depth 11, and edges will only be searched up to depth 8.
+func NewPhase2Heuristic(moves *Phase2Moves, complete bool) *Phase2Heuristic {
 	res := new(Phase2Heuristic)
 
 	// Make all the move counts -1 by default.
@@ -26,6 +31,9 @@ func NewPhase2Heuristic(moves *Phase2Moves) *Phase2Heuristic {
 			continue
 		}
 		res.CornersSlice[node.hash()] = node.depth
+		if !complete && node.depth == 11 {
+			continue
+		}
 		for m := 0; m < 10; m++ {
 			p4 := moves.SliceMoves[node.perm4][m]
 			p8 := moves.CornerMoves[node.perm8][m]
@@ -42,6 +50,9 @@ func NewPhase2Heuristic(moves *Phase2Moves) *Phase2Heuristic {
 			continue
 		}
 		res.EdgesSlice[node.hash()] = node.depth
+		if !complete && node.depth == 8 {
+			continue
+		}
 		for m := 0; m < 10; m++ {
 			p4 := moves.SliceMoves[node.perm4][m]
 			p8 := moves.EdgeMoves[node.perm8][m]
@@ -58,6 +69,14 @@ func (p *Phase2Heuristic) LowerBound(c *Phase2Cube) int {
 	edgesSlice := c.EdgePermutation*24 + c.SlicePermutation
 	cMoves := p.CornersSlice[cornersSlice]
 	eMoves := p.EdgesSlice[edgesSlice]
+	
+	if cMoves < 0 {
+		cMoves = 12
+	}
+	if eMoves < 0 {
+		eMoves = 9
+	}
+	
 	if eMoves > cMoves {
 		return int(eMoves)
 	} else {
