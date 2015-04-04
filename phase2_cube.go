@@ -71,6 +71,12 @@ func (p *Phase2Cube) Solved() bool {
 // respectively.
 type Phase2Move int
 
+// Face returns a number from [1, 6] corresponding to the face of the move if it
+// were applied on the Y axis.
+func (p Phase2Move) Face() int {
+	return []int{2, 3, 4, 5, 0, 0, 0, 1, 1, 1}[int(p)]
+}
+
 // Inverse returns the move's inverse.
 func (p Phase2Move) Inverse() Phase2Move {
 	return []Phase2Move{0, 1, 2, 3, 5, 4, 6, 8, 7, 9}[int(p)]
@@ -100,7 +106,7 @@ func NewPhase2Moves() *Phase2Moves {
 	res := new(Phase2Moves)
 
 	perm8 := allPermutations(8)
-	
+
 	// We set some states to -1, that way we can tell which states have been
 	// found and which have not.
 	for i := 0; i < 40320; i++ {
@@ -124,13 +130,13 @@ func NewPhase2Moves() *Phase2Moves {
 			if res.CornerMoves[state][m] >= 0 {
 				continue
 			}
-			
+
 			// Record the end state of this move.
 			c := corners
 			c.Move(Phase2Move(m).Move(1))
 			endState := encodeYCornerPerm(&c)
 			res.CornerMoves[state][m] = endState
-			
+
 			// For the end state, the inverse of this move gets the current
 			// state.
 			res.CornerMoves[endState][int(Phase2Move(m).Inverse())] = state
@@ -153,19 +159,19 @@ func NewPhase2Moves() *Phase2Moves {
 			if res.EdgeMoves[state][m] >= 0 {
 				continue
 			}
-			
+
 			// Record the end state of this move.
 			e := edges
 			e.Move(Phase2Move(m).Move(1))
 			endState := encodeUDEdges(&e)
 			res.EdgeMoves[state][m] = endState
-			
+
 			// For the end state, the inverse of this move gets the current
 			// state.
 			res.EdgeMoves[endState][int(Phase2Move(m).Inverse())] = state
 		}
 	}
-	
+
 	// Generate slice moves
 	for state, perm := range allPermutations(4) {
 		edges := SolvedCubieEdges()

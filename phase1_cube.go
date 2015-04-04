@@ -165,7 +165,7 @@ type Phase1Moves struct {
 // NewPhase1Moves generates tables for applying phase-1 moves.
 func NewPhase1Moves() *Phase1Moves {
 	res := &Phase1Moves{}
-	
+
 	// Set states to -1 so we can track which ones have already been set.
 	for i := 0; i < 495; i++ {
 		for j := 0; j < 18; j++ {
@@ -190,13 +190,13 @@ func NewPhase1Moves() *Phase1Moves {
 			if res.COMoves[i][m] >= 0 {
 				continue
 			}
-			
+
 			// Set the end state in the table.
 			aCase := corners
 			aCase.Move(Move(m))
 			endState := encodeCO(&aCase)
 			res.COMoves[i][m] = endState
-			
+
 			// Set the inverse of the end state in the table.
 			res.COMoves[endState][int(Move(m).Inverse())] = i
 		}
@@ -209,13 +209,13 @@ func NewPhase1Moves() *Phase1Moves {
 			if res.EOMoves[i][m] >= 0 {
 				continue
 			}
-			
+
 			// Set the end state in the table.
 			aCase := edges
 			aCase.Move(Move(m))
 			endState := encodeEO(&aCase)
 			res.EOMoves[i][m] = endState
-			
+
 			// Set the inverse of the end state in the table.
 			res.EOMoves[endState][int(Move(m).Inverse())] = i
 		}
@@ -237,13 +237,13 @@ func NewPhase1Moves() *Phase1Moves {
 						if res.ESliceMoves[eSliceCase][m] >= 0 {
 							continue
 						}
-						
+
 						// Set the end state in the table.
 						aCase := edges
 						aCase.Move(Move(m))
 						encoded := encodeBogusESlice(&aCase)
 						res.ESliceMoves[eSliceCase][m] = encoded
-						
+
 						// Set the inverse of the end state in the table.
 						res.ESliceMoves[encoded][int(Move(m).Inverse())] =
 							eSliceCase
