@@ -73,3 +73,18 @@ func TestNewPhase2Cube(t *testing.T) {
 		}
 	}
 }
+
+func TestPhase2Moves(t *testing.T) {
+	// Do the algorithm "R2 U F2 D2 L2 D' B2 R2 L2 D2 U' F2 D R2 U R2 D2"
+	moves := []Phase2Move{2, 4, 0, 9, 3, 8, 1, 2, 3, 9, 5, 0, 7, 2, 4, 2, 9}
+	table := NewPhase2Moves()
+	state := SolvedPhase2Cube()
+	for _, m := range moves {
+		state.Move(m, table)
+	}
+	c := Phase2Cube{29024, 14092, 2}
+	if state != c {
+		t.Error("Invalid state", state, "after doing R2 U F2 D2 L2 D' B2 " +
+			"R2 L2 D2 U' F2 D R2 U R2 D2")
+	}
+}

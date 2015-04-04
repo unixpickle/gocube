@@ -53,6 +53,19 @@ func SolvedPhase2Cube() Phase2Cube {
 	return Phase2Cube{}
 }
 
+// Move applies a move to the Phase2Cube.
+func (p *Phase2Cube) Move(move Phase2Move, table *Phase2Moves) {
+	p.CornerPermutation = table.CornerMoves[p.CornerPermutation][int(move)]
+	p.EdgePermutation = table.EdgeMoves[p.EdgePermutation][int(move)]
+	p.SlicePermutation = table.SliceMoves[p.SlicePermutation][int(move)]
+}
+
+// Solved returns true if the Phase2Cube is solved.
+func (p *Phase2Cube) Solved() bool {
+	return p.CornerPermutation == 0 && p.EdgePermutation == 0 &&
+		p.SlicePermutation == 0
+}
+
 // Phase2Move represents a move which can be applied to a Phase2Cube. This is a
 // number in the range [0, 10), corresponding to F2 B2 R2 L2 U U' U2 D D' D2
 // respectively.
