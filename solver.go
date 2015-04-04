@@ -1,7 +1,5 @@
 package gocube
 
-import "fmt"
-
 // A Solver finds shorter and shorter solutions in the background.
 type Solver struct {
 	stopper   chan struct{}
@@ -64,8 +62,6 @@ OuterLoop:
 			if p2Solution == nil {
 				continue
 			}
-			
-			fmt.Println("p1", p1Solution.Moves, "p2", p2Solution)
 
 			// Join the two solutions.
 			solution := make([]Move, len(p1Solution.Moves))
