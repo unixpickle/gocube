@@ -80,11 +80,58 @@ type Phase2Moves struct {
 // NewPhase2Moves generates a Phase2Moves table.
 func NewPhase2Moves() *Phase2Moves {
 	res := new(Phase2Moves)
-	
-	// TODO: generate corner moves
-	// TODO: generate edge moves
-	// TODO: generate slice moves
-	
+
+	perm8 := allPermutations(8)
+
+	// Generate corner cases.
+	for state, perm := range perm8 {
+		corners := SolvedCubieCorners()
+		// Permute the UD edges for the current case.
+		for j, x := range perm {
+			corners[j].Piece = x
+		}
+		// Apply all 10 moves to the cube.
+		for m := 0; m < 10; m++ {
+			c := corners
+			c.Move(Phase2Move(m).Move(1))
+			res.CornerMoves[state][m] = encodeYCornerPerm(&c)
+		}
+	}
+
+	// Generate edge cases.
+	for state, perm := range perm8 {
+		edges := SolvedCubieEdges()
+		// Permute the UD edges for the current case.
+		for j, x := range perm {
+			slot := []int{6, 5, 0, 4, 8, 11, 2, 10}[j]
+			piece := []int{6, 5, 0, 4, 8, 11, 2, 10}[x]
+			edges[slot].Piece = piece
+		}
+		// Apply all 10 moves to the cube.
+		for m := 0; m < 10; m++ {
+			e := edges
+			e.Move(Phase2Move(m).Move(1))
+			res.EdgeMoves[state][m] = encodeUDEdges(&e)
+		}
+	}
+
+	// Generate slice moves
+	for state, perm := range allPermutations(4) {
+		edges := SolvedCubieEdges()
+		// Permute the E slice for the current case.
+		for j, x := range perm {
+			slot := []int{1, 3, 7, 9}[j]
+			piece := []int{1, 3, 7, 9}[x]
+			edges[slot].Piece = piece
+		}
+		// Apply all 10 moves to the cube.
+		for m := 0; m < 10; m++ {
+			e := edges
+			e.Move(Phase2Move(m).Move(1))
+			res.SliceMoves[state][m] = encodeESlicePerm(&e)
+		}
+	}
+
 	return res
 }
 
