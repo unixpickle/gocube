@@ -25,8 +25,8 @@ func allPermutations(size int) [][]int {
 	} else if size == 1 {
 		return [][]int{[]int{0}}
 	}
-
-	result := [][]int{}
+	
+	result := make([][]int, 0, factorial(size))
 	subPermutations := allPermutations(size - 1)
 
 	// For every starting element, go through every sub permutation and generate

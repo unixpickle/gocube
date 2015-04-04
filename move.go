@@ -31,6 +31,17 @@ func (m Move) Face() int {
 	return (int(m) % 6) + 1
 }
 
+// Inverse returns the move's inverse.
+func (m Move) Inverse() Move {
+	if m < 6 {
+		return m + 6
+	} else if m < 12 {
+		return m - 6
+	} else {
+		return m
+	}
+}
+
 // Turns returns 1, -1, or 2 to indicate the number of times the face is turned.
 func (m Move) Turns() int {
 	res := int(m) / 6

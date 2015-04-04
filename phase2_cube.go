@@ -100,14 +100,17 @@ func NewPhase2Moves() *Phase2Moves {
 	res := new(Phase2Moves)
 
 	perm8 := allPermutations(8)
-
-	// Generate corner cases.
+	
+	// We set some states to -1, that way we can tell which states have been
+	// found and which have not.
 	for i := 0; i < 40320; i++ {
 		for j := 0; j < 10; j++ {
 			res.CornerMoves[i][j] = -1
 			res.EdgeMoves[i][j] = -1
 		}
 	}
+
+	// Generate corner cases.
 	for state, perm := range perm8 {
 		corners := SolvedCubieCorners()
 		// Permute the UD edges for the current case.
@@ -162,7 +165,7 @@ func NewPhase2Moves() *Phase2Moves {
 			res.EdgeMoves[endState][int(Phase2Move(m).Inverse())] = state
 		}
 	}
-
+	
 	// Generate slice moves
 	for state, perm := range allPermutations(4) {
 		edges := SolvedCubieEdges()

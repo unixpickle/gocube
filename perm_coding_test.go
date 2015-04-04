@@ -2,7 +2,13 @@ package gocube
 
 import "testing"
 
-func BenchmarkEncodePermutationInPlace(b *testing.B) {
+func BenchmarkAllPermutations8(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		allPermutations(8)
+	}
+}
+
+func BenchmarkEncodePermutationInPlace8(b *testing.B) {
 	perms := allPermutations(8)
 	for i := 0; i < b.N/len(perms); i++ {
 		for _, p := range perms {

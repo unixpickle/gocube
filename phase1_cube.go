@@ -165,14 +165,40 @@ type Phase1Moves struct {
 // NewPhase1Moves generates tables for applying phase-1 moves.
 func NewPhase1Moves() *Phase1Moves {
 	res := &Phase1Moves{}
+	
+	// Set states to -1 so we can track which ones have already been set.
+	for i := 0; i < 495; i++ {
+		for j := 0; j < 18; j++ {
+			res.ESliceMoves[i][j] = -1
+		}
+	}
+	for i := 0; i < 2048; i++ {
+		for j := 0; j < 18; j++ {
+			res.EOMoves[i][j] = -1
+		}
+	}
+	for i := 0; i < 2187; i++ {
+		for j := 0; j < 18; j++ {
+			res.COMoves[i][j] = -1
+		}
+	}
 
 	// Generate the CO cases and do moves on them.
 	for i := 0; i < 2187; i++ {
 		corners := decodeCO(i)
 		for m := 0; m < 18; m++ {
+			if res.COMoves[i][m] >= 0 {
+				continue
+			}
+			
+			// Set the end state in the table.
 			aCase := corners
 			aCase.Move(Move(m))
-			res.COMoves[i][m] = encodeCO(&aCase)
+			endState := encodeCO(&aCase)
+			res.COMoves[i][m] = endState
+			
+			// Set the inverse of the end state in the table.
+			res.COMoves[endState][int(Move(m).Inverse())] = i
 		}
 	}
 
@@ -180,9 +206,18 @@ func NewPhase1Moves() *Phase1Moves {
 	for i := 0; i < 2048; i++ {
 		edges := decodeEO(i)
 		for m := 0; m < 18; m++ {
+			if res.EOMoves[i][m] >= 0 {
+				continue
+			}
+			
+			// Set the end state in the table.
 			aCase := edges
 			aCase.Move(Move(m))
-			res.EOMoves[i][m] = encodeEO(&aCase)
+			endState := encodeEO(&aCase)
+			res.EOMoves[i][m] = endState
+			
+			// Set the inverse of the end state in the table.
+			res.EOMoves[endState][int(Move(m).Inverse())] = i
 		}
 	}
 
@@ -199,10 +234,19 @@ func NewPhase1Moves() *Phase1Moves {
 					edges[y].Piece = 1
 					edges[z].Piece = 1
 					for m := 0; m < 18; m++ {
+						if res.ESliceMoves[eSliceCase][m] >= 0 {
+							continue
+						}
+						
+						// Set the end state in the table.
 						aCase := edges
 						aCase.Move(Move(m))
 						encoded := encodeBogusESlice(&aCase)
 						res.ESliceMoves[eSliceCase][m] = encoded
+						
+						// Set the inverse of the end state in the table.
+						res.ESliceMoves[encoded][int(Move(m).Inverse())] =
+							eSliceCase
 					}
 					eSliceCase++
 				}
