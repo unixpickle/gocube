@@ -21,7 +21,7 @@ func NewPhase2Heuristic(moves *Phase2Moves, complete bool) *Phase2Heuristic {
 		res.CornersSlice[i] = -1
 		res.EdgesSlice[i] = -1
 	}
-	
+
 	// Generate CornersSlice
 	nodes := []phase2Node{phase2Node{0, 0, 0}}
 	for len(nodes) > 0 {
@@ -40,7 +40,7 @@ func NewPhase2Heuristic(moves *Phase2Moves, complete bool) *Phase2Heuristic {
 			nodes = append(nodes, phase2Node{p4, p8, node.depth + 1})
 		}
 	}
-	
+
 	// Generate EdgesSlice
 	nodes = []phase2Node{phase2Node{0, 0, 0}}
 	for len(nodes) > 0 {
@@ -69,14 +69,14 @@ func (p *Phase2Heuristic) LowerBound(c *Phase2Cube) int {
 	edgesSlice := c.EdgePermutation*24 + c.SlicePermutation
 	cMoves := p.CornersSlice[cornersSlice]
 	eMoves := p.EdgesSlice[edgesSlice]
-	
+
 	if cMoves < 0 {
 		cMoves = 12
 	}
 	if eMoves < 0 {
 		eMoves = 9
 	}
-	
+
 	if eMoves > cMoves {
 		return int(eMoves)
 	} else {

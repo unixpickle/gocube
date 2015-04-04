@@ -26,7 +26,7 @@ func BenchmarkPhase2Move(b *testing.B) {
 	cube := SolvedPhase2Cube()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		cube.Move(Phase2Move(i % 10), moves)
+		cube.Move(Phase2Move(i%10), moves)
 	}
 }
 

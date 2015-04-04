@@ -222,6 +222,7 @@ func (p *Phase1Solver) search(solutions chan<- Phase1Solution, c Phase1Cube) {
 	for {
 		moves := make([]Move, 0, depth)
 		if !p.depthFirst(solutions, c, moves, depth, 0) {
+			close(solutions)
 			return
 		}
 		depth++
