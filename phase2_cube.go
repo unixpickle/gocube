@@ -48,6 +48,11 @@ func NewPhase2Cube(c CubieCube, axis int) (Phase2Cube, error) {
 	return res, nil
 }
 
+// SolvedPhase2Cube returns a solved Phase2Cube.
+func SolvedPhase2Cube() Phase2Cube {
+	return Phase2Cube{}
+}
+
 func encodeESlicePerm(e *CubieEdges) int {
 	// Generate a permutation of {0, 1, 2, 3} that represents the permutation of
 	// the E slice.
