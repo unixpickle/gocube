@@ -20,7 +20,7 @@ func main() {
 	}
 
 	fmt.Println("Solving...")
-	solver := gocube.NewSolver(*cc)
+	solver := gocube.NewSolver(*cc, 30)
 	for solution := range solver.Solutions() {
 		fmt.Println("Solution:", solution, "-", len(solution), "moves")
 	}

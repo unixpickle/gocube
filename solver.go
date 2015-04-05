@@ -8,7 +8,7 @@ type Solver struct {
 }
 
 // NewSolver creates a new solver.
-func NewSolver(c CubieCube) *Solver {
+func NewSolver(c CubieCube, max int) *Solver {
 	p1Moves := NewPhase1Moves()
 	p1Heuristic := NewPhase1Heuristic(p1Moves, false)
 
@@ -17,19 +17,19 @@ func NewSolver(c CubieCube) *Solver {
 	res.solutions = make(chan []Move)
 	res.phase1 = NewPhase1Solver(c.Phase1Cube(), p1Heuristic, p1Moves)
 
-	go res.backgroundLoop(c, nil)
+	go res.backgroundLoop(c, nil, max)
 	return res
 }
 
 // NewSolverTables creates a new solver using a set of pre-generated tables.
-func NewSolverTables(c CubieCube, tables SolverTables) *Solver {
+func NewSolverTables(c CubieCube, max int, tables SolverTables) *Solver {
 	res := new(Solver)
 	res.stopper = make(chan struct{})
 	res.solutions = make(chan []Move)
 	res.phase1 = NewPhase1Solver(c.Phase1Cube(), tables.P1Heuristic,
 		tables.P1Moves)
 
-	go res.backgroundLoop(c, &tables)
+	go res.backgroundLoop(c, &tables, max)
 	return res
 }
 
@@ -45,7 +45,7 @@ func (s *Solver) Stop() {
 	close(s.stopper)
 }
 
-func (s *Solver) backgroundLoop(c CubieCube, tables *SolverTables) {
+func (s *Solver) backgroundLoop(c CubieCube, tables *SolverTables, max int) {
 	// Get the tables.
 	var p2Moves *Phase2Moves
 	var p2Heuristic *Phase2Heuristic
@@ -57,10 +57,13 @@ func (s *Solver) backgroundLoop(c CubieCube, tables *SolverTables) {
 		p2Heuristic = NewPhase2Heuristic(p2Moves, false)
 	}
 
-	maxLength := 30
-
 OuterLoop:
 	for p1Solution := range s.phase1.Solutions() {
+		if len(p1Solution.Moves) > max {
+			s.Stop()
+			break
+		}
+		
 		// Generate the cube after solving phase1.
 		cube := c
 		for _, m := range p1Solution.Moves {
@@ -79,7 +82,7 @@ OuterLoop:
 			if err != nil {
 				continue
 			}
-			p2Solution := SolvePhase2(cube, maxLength-len(p1Solution.Moves),
+			p2Solution := SolvePhase2(cube, max-len(p1Solution.Moves),
 				p2Heuristic, p2Moves)
 			if p2Solution == nil {
 				continue
@@ -91,7 +94,7 @@ OuterLoop:
 			for _, move := range p2Solution {
 				solution = append(solution, move.Move(axis))
 			}
-			maxLength = len(solution) - 1
+			max = len(solution) - 1
 			select {
 			case <-s.stopper:
 				break OuterLoop
