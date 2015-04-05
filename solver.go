@@ -17,7 +17,19 @@ func NewSolver(c CubieCube) *Solver {
 	res.solutions = make(chan []Move)
 	res.phase1 = NewPhase1Solver(c.Phase1Cube(), p1Heuristic, p1Moves)
 
-	go res.backgroundLoop(c)
+	go res.backgroundLoop(c, nil)
+	return res
+}
+
+// NewSolverTables creates a new solver using a set of pre-generated tables.
+func NewSolverTables(c CubieCube, tables SolverTables) *Solver {
+	res := new(Solver)
+	res.stopper = make(chan struct{})
+	res.solutions = make(chan []Move)
+	res.phase1 = NewPhase1Solver(c.Phase1Cube(), tables.P1Heuristic,
+		tables.P1Moves)
+
+	go res.backgroundLoop(c, &tables)
 	return res
 }
 
@@ -33,10 +45,20 @@ func (s *Solver) Stop() {
 	close(s.stopper)
 }
 
-func (s *Solver) backgroundLoop(c CubieCube) {
+func (s *Solver) backgroundLoop(c CubieCube, tables *SolverTables) {
+	// Get the tables.
+	var p2Moves *Phase2Moves
+	var p2Heuristic *Phase2Heuristic
+	if tables != nil {
+		p2Moves = tables.P2Moves
+		p2Heuristic = tables.P2Heuristic
+	} else {
+		p2Moves = NewPhase2Moves()
+		p2Heuristic = NewPhase2Heuristic(p2Moves, false)
+	}
+
 	maxLength := 30
-	p2Moves := NewPhase2Moves()
-	p2Heuristic := NewPhase2Heuristic(p2Moves, false)
+
 OuterLoop:
 	for p1Solution := range s.phase1.Solutions() {
 		// Generate the cube after solving phase1.
@@ -81,4 +103,11 @@ OuterLoop:
 		}
 	}
 	close(s.solutions)
+}
+
+type SolverTables struct {
+	P1Heuristic *Phase1Heuristic
+	P1Moves     *Phase1Moves
+	P2Heuristic *Phase2Heuristic
+	P2Moves     *Phase2Moves
 }

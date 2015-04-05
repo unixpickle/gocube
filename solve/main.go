@@ -18,7 +18,7 @@ func main() {
 		fmt.Println("Invalid stickers:", err)
 		os.Exit(1)
 	}
-	
+
 	fmt.Println("Solving...")
 	solver := gocube.NewSolver(*cc)
 	for solution := range solver.Solutions() {

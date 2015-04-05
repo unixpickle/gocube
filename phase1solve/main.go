@@ -18,11 +18,11 @@ func main() {
 		fmt.Println("Invalid stickers:", err)
 		os.Exit(1)
 	}
-	
+
 	fmt.Println("Generating data...")
 	moves := gocube.NewPhase1Moves()
 	heuristic := gocube.NewPhase1Heuristic(moves, false)
-	
+
 	fmt.Println("Searching...")
 	solver := gocube.NewPhase1Solver(cc.Phase1Cube(), heuristic, moves)
 	for solution := range solver.Solutions() {
