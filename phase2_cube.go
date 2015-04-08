@@ -150,13 +150,6 @@ func NewPhase2Moves() *Phase2Moves {
 
 	// Generate edge cases.
 	for state, perm := range perm8 {
-		edges := SolvedCubieEdges()
-		// Permute the UD edges for the current case.
-		for j, x := range perm {
-			slot := []int{6, 5, 0, 4, 8, 11, 2, 10}[j]
-			piece := []int{6, 5, 0, 4, 8, 11, 2, 10}[x]
-			edges[slot].Piece = piece
-		}
 		// Apply all 10 moves to the cube.
 		for m := 0; m < 10; m++ {
 			// The result of this move may have already been computed as an
@@ -166,9 +159,7 @@ func NewPhase2Moves() *Phase2Moves {
 			}
 
 			// Record the end state of this move.
-			e := edges
-			e.Move(Phase2Move(m).Move(1))
-			endState := encodeUDEdges(&e)
+			endState := moveUDEdgePerm(perm, Phase2Move(m))
 			res.EdgeMoves[state][m] = endState
 
 			// For the end state, the inverse of this move gets the current
@@ -301,4 +292,45 @@ func encodeZCornerPerm(c *CubieCorners) int {
 		perm[i] = inverseZCornerIndices[(*c)[idx].Piece]
 	}
 	return encodePermutationInPlace(perm[:])
+}
+
+func moveYCornerPerm(perm []int, move Phase2Move) int {
+	
+}
+
+func moveUDEdgePerm(perm []int, move Phase2Move) int {
+	var newPerm [8]int
+	copy(newPerm[:], perm)
+	
+	// The moves are F2, B2, R2, L2, U, U', U2, D, D', D2.
+	switch (move) {
+	case 0:
+		newPerm[2], newPerm[6] = newPerm[6], newPerm[2]
+	case 1:
+		newPerm[0], newPerm[4] = newPerm[4], newPerm[0]
+	case 2:
+		newPerm[1], newPerm[5] = newPerm[5], newPerm[1]
+	case 3:
+		newPerm[3], newPerm[7] = newPerm[7], newPerm[3]
+	case 4:
+		newPerm[0], newPerm[1], newPerm[2], newPerm[3] =
+			newPerm[3], newPerm[0], newPerm[1], newPerm[2]
+	case 5:
+		newPerm[3], newPerm[0], newPerm[1], newPerm[2] =
+			newPerm[0], newPerm[1], newPerm[2], newPerm[3]
+	case 6:
+		newPerm[0], newPerm[2] = newPerm[2], newPerm[0]
+		newPerm[1], newPerm[3] = newPerm[3], newPerm[1]
+	case 7:
+		newPerm[7], newPerm[4], newPerm[5], newPerm[6] =
+			newPerm[4], newPerm[5], newPerm[6], newPerm[7]
+	case 8:
+		newPerm[4], newPerm[5], newPerm[6], newPerm[7] =
+			newPerm[7], newPerm[4], newPerm[5], newPerm[6]
+	case 9:
+		newPerm[4], newPerm[6] = newPerm[6], newPerm[4]
+		newPerm[5], newPerm[7] = newPerm[7], newPerm[5]
+	}
+	
+	return encodePermutationInPlace(newPerm[:])
 }
