@@ -123,11 +123,6 @@ func NewPhase2Moves() *Phase2Moves {
 
 	// Generate corner cases.
 	for state, perm := range perm8 {
-		corners := SolvedCubieCorners()
-		// Permute the UD edges for the current case.
-		for j, x := range perm {
-			corners[j].Piece = x
-		}
 		// Apply all 10 moves to the cube.
 		for m := 0; m < 10; m++ {
 			// The result of this move may have already been computed as an
@@ -137,9 +132,7 @@ func NewPhase2Moves() *Phase2Moves {
 			}
 
 			// Record the end state of this move.
-			c := corners
-			c.Move(Phase2Move(m).Move(1))
-			endState := encodeYCornerPerm(&c)
+			endState := moveYCornerPerm(perm, Phase2Move(m))
 			res.CornerMoves[state][m] = endState
 
 			// For the end state, the inverse of this move gets the current
@@ -294,10 +287,6 @@ func encodeZCornerPerm(c *CubieCorners) int {
 	return encodePermutationInPlace(perm[:])
 }
 
-func moveYCornerPerm(perm []int, move Phase2Move) int {
-	
-}
-
 func moveUDEdgePerm(perm []int, move Phase2Move) int {
 	var newPerm [8]int
 	copy(newPerm[:], perm)
@@ -333,4 +322,41 @@ func moveUDEdgePerm(perm []int, move Phase2Move) int {
 	}
 	
 	return encodePermutationInPlace(newPerm[:])
+}
+
+func moveYCornerPerm(perm []int, move Phase2Move) int {
+	var p [8]int
+	copy(p[:], perm)
+	
+	// The moves are F2, B2, R2, L2, U, U', U2, D, D', D2.
+	switch (move) {
+	case 0:
+		p[5], p[6] = p[6], p[5]
+		p[4], p[7] = p[7], p[4]
+	case 1:
+		p[1], p[2] = p[2], p[1]
+		p[0], p[3] = p[3], p[0]
+	case 2:
+		p[1], p[7] = p[7], p[1]
+		p[3], p[5] = p[5], p[3]
+	case 3:
+		p[0], p[6] = p[6], p[0]
+		p[2], p[4] = p[4], p[2]
+	case 4:
+		p[2], p[3], p[7], p[6] = p[6], p[2], p[3], p[7]
+	case 5:
+		p[6], p[2], p[3], p[7] = p[2], p[3], p[7], p[6]
+	case 6:
+		p[2], p[7] = p[7], p[2]
+		p[3], p[6] = p[6], p[3]
+	case 7:
+		p[0], p[1], p[5], p[4] = p[1], p[5], p[4], p[0]
+	case 8:
+		p[1], p[5], p[4], p[0] = p[0], p[1], p[5], p[4]
+	case 9:
+		p[0], p[5] = p[5], p[0]
+		p[1], p[4] = p[4], p[1]
+	}
+	
+	return encodePermutationInPlace(p[:])
 }
