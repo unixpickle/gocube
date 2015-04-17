@@ -5,25 +5,17 @@ import (
 	"testing"
 )
 
-func BenchmarkNewPhase1HeuristicComplete(b *testing.B) {
+func BenchmarkNewPhase1Heuristic(b *testing.B) {
 	moves := NewPhase1Moves()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		NewPhase1Heuristic(moves, true)
-	}
-}
-
-func BenchmarkNewPhase1HeuristicIncomplete(b *testing.B) {
-	moves := NewPhase1Moves()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		NewPhase1Heuristic(moves, false)
+		NewPhase1Heuristic(moves)
 	}
 }
 
 func BenchmarkPhase1Solver(b *testing.B) {
 	moves := NewPhase1Moves()
-	heuristic := NewPhase1Heuristic(moves, false)
+	heuristic := NewPhase1Heuristic(moves)
 
 	b.ResetTimer()
 
@@ -41,7 +33,7 @@ func BenchmarkPhase1Solver(b *testing.B) {
 
 func TestPhase1Heuristic(t *testing.T) {
 	table := NewPhase1Moves()
-	heuristic := NewPhase1Heuristic(table, false)
+	heuristic := NewPhase1Heuristic(table)
 
 	// Do random move sequences and ensure that the lower bound is never too
 	// high.
@@ -64,7 +56,7 @@ func TestPhase1Heuristic(t *testing.T) {
 
 func TestPhase1Solver(t *testing.T) {
 	table := NewPhase1Moves()
-	heuristic := NewPhase1Heuristic(table, false)
+	heuristic := NewPhase1Heuristic(table)
 
 	// Do a bunch of random move sequences and make sure a solution is found.
 	for length := 1; length <= 12; length++ {

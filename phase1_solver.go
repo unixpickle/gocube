@@ -3,80 +3,42 @@ package gocube
 // Phase1Heuristic stores the data needed to effectively prune the search for a
 // solution for phase-1.
 type Phase1Heuristic struct {
-	// This stores the number of moves needed to orient the corners. All the
-	// fields in this array should be filled in.
-	CO [2187]int8
+	// This stores the number of moves needed to orient the corners and edges.
+	COEO [4478976]uint8
 
-	// This stores the number of moves needed to solve a given EO + E Slice
-	// case. The fields are combined using slice*2048 + eo. If a value in this
-	// array is -1, it should be interpreted as 8. This is because depths
-	// greater than 7 will not be searched if the index was made under time
-	// pressure.
-	EOSlice [1013760]int8
+	// This stores the number of moves needed orient the edges and put the slice
+	// edges on the slice.
+	EOSlice [1013760]uint8
 }
 
 // NewPhase1Heuristic generates a heuristic for the phase-1 solver.
-// The complete argument specifies if the entire EOSlice table should be
-// generated.
-func NewPhase1Heuristic(moves *Phase1Moves, complete bool) *Phase1Heuristic {
+func NewPhase1Heuristic(moves *Phase1Moves) *Phase1Heuristic {
 	res := new(Phase1Heuristic)
-	res.computeCO(moves)
-	res.computeEOSlice(moves, complete)
+	res.computeCOEO(moves)
+	res.computeEOSlice(moves)
 	return res
-}
-
-// AllLowerBound returns the minimum number of moves needed to solve all the
-// phase-1 axes at once.
-func (p *Phase1Heuristic) AllLowerBound(c *Phase1Cube) int {
-	var result int8
-
-	// Corner orientation heuristic.
-	if r := p.CO[c.XCornerOrientation]; r > result {
-		result = r
-	}
-	if r := p.CO[c.YCornerOrientation]; r > result {
-		result = r
-	}
-	if r := p.CO[c.ZCornerOrientation]; r > result {
-		result = r
-	}
-
-	// EOSlice heuristic.
-	sliceValues := []int{
-		c.MSlicePermutation*2048 + c.XEdgeOrientation(),
-		c.ESlicePermutation*2048 + c.FBEdgeOrientation,
-		c.SSlicePermutation*2048 + c.UDEdgeOrientation,
-	}
-	for _, eoSlice := range sliceValues {
-		if r := p.EOSlice[eoSlice]; r > result {
-			result = r
-		} else if r < 0 && result < 8 {
-			result = 8
-		}
-	}
-
-	return int(result)
 }
 
 // LowerBound returns the minimum number of moves needed to solve at least one
 // phase-1 axis.
 func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
-	finalResult := int8(127)
-
+	finalResult := uint8(127)
+	
+	coEOValues := []int{
+		c.XCornerOrientation*2048 + c.XEdgeOrientation(),
+		c.YCornerOrientation*2048 + c.FBEdgeOrientation,
+		c.ZCornerOrientation*2048 + c.UDEdgeOrientation,
+	}
 	sliceValues := []int{
 		c.MSlicePermutation*2048 + c.XEdgeOrientation(),
 		c.ESlicePermutation*2048 + c.FBEdgeOrientation,
 		c.SSlicePermutation*2048 + c.UDEdgeOrientation,
 	}
-	coValues := []int{c.XCornerOrientation, c.YCornerOrientation,
-		c.ZCornerOrientation}
 
 	for axis := 0; axis < 3; axis++ {
-		result := p.CO[coValues[axis]]
+		result := p.COEO[coEOValues[axis]]
 		if r := p.EOSlice[sliceValues[axis]]; r > result {
 			result = r
-		} else if r < 0 && result < 8 {
-			result = 8
 		}
 		if result < finalResult {
 			finalResult = result
@@ -86,28 +48,42 @@ func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
 	return int(finalResult)
 }
 
-func (p *Phase1Heuristic) computeCO(moves *Phase1Moves) {
-	for i := 0; i < 2187; i++ {
-		p.CO[i] = -1
+func (p *Phase1Heuristic) computeCOEO(moves *Phase1Moves) {
+	for i := 0; i < 4478976; i++ {
+		p.COEO[i] = 8
 	}
-	nodes := []phase1CONode{phase1CONode{1093, 0}}
+	
+	nodes := []phase1COEONode{phase1COEONode{1093, 0, 0}}
+	visited := make([]bool, 4478976)
 	for len(nodes) > 0 {
 		node := nodes[0]
 		nodes = nodes[1:]
-		if p.CO[node.corners] != -1 {
+		hash := node.co*2048 + node.eo
+		if p.COEO[hash] != 8 {
 			continue
 		}
-		p.CO[node.corners] = node.depth
+		p.COEO[hash] = node.depth
+		
+		if node.depth == 7 {
+			continue
+		}
+		
 		for move := 0; move < 18; move++ {
-			applied := moves.COMoves[node.corners][move]
-			nodes = append(nodes, phase1CONode{applied, node.depth + 1})
+			newCO := moves.COMoves[node.co][move]
+			newEO := moves.EOMoves[node.eo][move]
+			newHash := newCO*2048 + newEO
+			if !visited[newHash] {
+				nodes = append(nodes, phase1COEONode{newCO, newEO,
+					node.depth + 1})
+				visited[newHash] = true
+			}
 		}
 	}
 }
 
-func (p *Phase1Heuristic) computeEOSlice(moves *Phase1Moves, complete bool) {
+func (p *Phase1Heuristic) computeEOSlice(moves *Phase1Moves) {
 	for i := 0; i < 1013760; i++ {
-		p.EOSlice[i] = -1
+		p.EOSlice[i] = 8
 	}
 	nodes := []phase1EOSliceNode{phase1EOSliceNode{0, 220, 0}}
 	visited := make([]bool, 1013760)
@@ -115,14 +91,12 @@ func (p *Phase1Heuristic) computeEOSlice(moves *Phase1Moves, complete bool) {
 		node := nodes[0]
 		nodes = nodes[1:]
 		hash := node.slice*2048 + node.eo
-		if p.EOSlice[hash] != -1 {
+		if p.EOSlice[hash] != 8 {
 			continue
 		}
 		p.EOSlice[hash] = node.depth
 
-		// Stop searching after 7 moves, which makes indexing faster and should
-		// not greatly affect search.
-		if !complete && node.depth == 7 {
+		if node.depth == 7 {
 			continue
 		}
 
@@ -234,13 +208,14 @@ func (p *Phase1Solver) search(solutions chan<- Phase1Solution, c Phase1Cube) {
 	}
 }
 
-type phase1CONode struct {
-	corners int
-	depth   int8
+type phase1COEONode struct {
+	co    int
+	eo    int
+	depth uint8
 }
 
 type phase1EOSliceNode struct {
 	eo    int
 	slice int
-	depth int8
+	depth uint8
 }

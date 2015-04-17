@@ -10,7 +10,7 @@ type Solver struct {
 // NewSolver creates a new solver.
 func NewSolver(c CubieCube, max int) *Solver {
 	p1Moves := NewPhase1Moves()
-	p1Heuristic := NewPhase1Heuristic(p1Moves, false)
+	p1Heuristic := NewPhase1Heuristic(p1Moves)
 
 	res := new(Solver)
 	res.stopper = make(chan struct{})
