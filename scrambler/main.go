@@ -27,7 +27,7 @@ func main() {
 	}
 
 	p1Moves := gocube.NewPhase1Moves()
-	p1Heuristic := gocube.NewPhase1Heuristic(p1Moves, false)
+	p1Heuristic := gocube.NewPhase1Heuristic(p1Moves)
 	p2Moves := gocube.NewPhase2Moves()
 	p2Heuristic := gocube.NewPhase2Heuristic(p2Moves, false)
 	tables := gocube.SolverTables{p1Heuristic, p1Moves, p2Heuristic, p2Moves}

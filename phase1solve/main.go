@@ -21,7 +21,7 @@ func main() {
 
 	fmt.Println("Generating data...")
 	moves := gocube.NewPhase1Moves()
-	heuristic := gocube.NewPhase1Heuristic(moves, false)
+	heuristic := gocube.NewPhase1Heuristic(moves)
 
 	fmt.Println("Searching...")
 	solver := gocube.NewPhase1Solver(cc.Phase1Cube(), heuristic, moves)
