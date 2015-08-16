@@ -164,7 +164,7 @@ func (c *CubieCorners) QuarterTurn(face, turns int) {
 // Solved returns true if all the corners are properly positioned and oriented.
 func (c *CubieCorners) Solved() bool {
 	for i := 0; i < 8; i++ {
-		if c[i].Piece != i || c[i].Orientation != 0 {
+		if c[i].Piece != i || c[i].Orientation != 1 {
 			return false
 		}
 	}
