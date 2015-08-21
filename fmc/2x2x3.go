@@ -79,16 +79,20 @@ func TwoStep2x2x3(cube gocube.CubieCube) <-chan []gocube.Move {
 			for _, move := range smallBlock {
 				start.Move(move)
 			}
-			moves := iterative2x2x3(start)
+			lastFace := -1
+			if len(smallBlock) > 0 {
+				lastFace = smallBlock[len(smallBlock)-1].Face()
+			}
+			moves := iterative2x2x3(start, lastFace)
 			channel <- append(smallBlock, moves...)
 		}
 	}()
 	return channel
 }
 
-func iterative2x2x3(start gocube.CubieCube) []gocube.Move {
+func iterative2x2x3(start gocube.CubieCube, lastFace int) []gocube.Move {
 	for depth := 0; true; depth++ {
-		if solution := solve2x2x3(start, depth, -1); solution != nil {
+		if solution := solve2x2x3(start, depth, lastFace); solution != nil {
 			return solution
 		}
 	}
@@ -98,7 +102,7 @@ func iterative2x2x3(start gocube.CubieCube) []gocube.Move {
 func solve2x2x3(start gocube.CubieCube, depth, lastFace int) []gocube.Move {
 	if depth == 0 {
 		if solved, _ := Is2x2x3Solved(start); solved {
-			return []Move{}
+			return []gocube.Move{}
 		} else {
 			return nil
 		}
@@ -111,8 +115,8 @@ func solve2x2x3(start gocube.CubieCube, depth, lastFace int) []gocube.Move {
 		}
 		newCube := start
 		newCube.Move(move)
-		if solution := solve2x2x3(start, depth-1, face); solution != nil {
-			return append([]gocube.Move{m}, solution...)
+		if solution := solve2x2x3(newCube, depth-1, face); solution != nil {
+			return append([]gocube.Move{move}, solution...)
 		}
 	}
 	return nil
