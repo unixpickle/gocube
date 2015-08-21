@@ -26,7 +26,7 @@ func Is2x2x2Solved(state gocube.CubieCube) (solved bool, cornerIndex int) {
 OuterLoop:
 	for i := 0; i < 8; i++ {
 		if state.Corners[i].Piece == i && state.Corners[i].Orientation == 1 {
-			for j := i*3; j < i*3+3; j++ {
+			for j := i * 3; j < i*3+3; j++ {
 				if !edgesSolved[edgesForCorners[j]] {
 					continue OuterLoop
 				}

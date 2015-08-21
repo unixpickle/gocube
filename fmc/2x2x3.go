@@ -53,13 +53,13 @@ OuterLoop:
 	for i := 0; i < 12; i++ {
 		if edgesSolved[i] {
 			if !cornersSolved[cornersForBlocks[i*2]] ||
-				 !cornersSolved[cornersForBlocks[i*2 + 1]] {
+				!cornersSolved[cornersForBlocks[i*2+1]] {
 				continue OuterLoop
 			}
 			if !edgesSolved[edgesForBlocks[i*4]] ||
-				!edgesSolved[edgesForBlocks[i*4 + 1]] ||
-				!edgesSolved[edgesForBlocks[i*4 + 2]] ||
-				!edgesSolved[edgesForBlocks[i*4 + 3]] {
+				!edgesSolved[edgesForBlocks[i*4+1]] ||
+				!edgesSolved[edgesForBlocks[i*4+2]] ||
+				!edgesSolved[edgesForBlocks[i*4+3]] {
 				continue OuterLoop
 			}
 			return true, i
