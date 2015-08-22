@@ -75,3 +75,56 @@ CrossLoop:
 
 	return false, -1, -1
 }
+
+// ThreeStepF2LMinus1 finds solutions to the F2L-1 by solving 2x2x3 in two steps
+// and then expanding them to F2L-1.
+func ThreeStepF2LMinus1(cube gocube.CubieCube) <-chan []gocube.Move {
+	channel := make(chan []gocube.Move, 1)
+	go func() {
+		for blockSolution := range TwoStep2x2x3(cube) {
+			start := cube
+			for _, move := range blockSolution {
+				start.Move(move)
+			}
+			lastFace := -1
+			if len(blockSolution) > 0 {
+				lastFace = blockSolution[len(blockSolution)-1].Face()
+			}
+			moves := iterativef2lminus1(start, lastFace)
+			channel <- append(blockSolution, moves...)
+		}
+	}()
+	return channel
+}
+
+func iterativef2lminus1(start gocube.CubieCube, lastFace int) []gocube.Move {
+	for depth := 0; true; depth++ {
+		if solution := solvef2lminus1(start, depth, lastFace); solution != nil {
+			return solution
+		}
+	}
+	return nil
+}
+
+func solvef2lminus1(start gocube.CubieCube, depth, lastFace int) []gocube.Move {
+	if depth == 0 {
+		if solved, _, _ := IsF2LMinus1Solved(start); solved {
+			return []gocube.Move{}
+		} else {
+			return nil
+		}
+	}
+	for m := 0; m < 18; m++ {
+		move := gocube.Move(m)
+		face := move.Face()
+		if face == lastFace {
+			continue
+		}
+		newCube := start
+		newCube.Move(move)
+		if solution := solvef2lminus1(newCube, depth-1, face); solution != nil {
+			return append([]gocube.Move{move}, solution...)
+		}
+	}
+	return nil
+}
