@@ -2,6 +2,9 @@ package fmc
 
 import "github.com/unixpickle/gocube"
 
+var globalEdgesHeuristic *EdgesHeuristic
+const globalEdgesHeuristicDepth = 5
+
 // IsAllButL5CSolved returns true if the cube is almost solved (having up to 5
 // unsolved corners).
 func IsAllButL5CSolved(cube gocube.CubieCube) bool {
@@ -23,6 +26,11 @@ func IsAllButL5CSolved(cube gocube.CubieCube) bool {
 // FourStepAllButL5C finds solutions to everything but the last 5 corners by
 // solving the F2L-1 and going from there.
 func FourStepAllButL5C(cube gocube.CubieCube) <-chan []gocube.Move {
+	if globalEdgesHeuristic == nil {
+		heuristic := NewEdgesHeuristic(globalEdgesHeuristicDepth)
+		globalEdgesHeuristic = &heuristic
+	}
+
 	channel := make(chan []gocube.Move, 1)
 	go func() {
 		for f2l1Solution := range ThreeStepF2LMinus1(cube) {
@@ -34,18 +42,15 @@ func FourStepAllButL5C(cube gocube.CubieCube) <-chan []gocube.Move {
 			if len(f2l1Solution) > 0 {
 				lastFace = f2l1Solution[len(f2l1Solution)-1].Face()
 			}
-			if moves := iterativeAllButL5C(start, lastFace); moves != nil {
-				channel <- append(f2l1Solution, moves...)
-			} else {
-				// TODO: here, use a 2-gen solution with unlimited depth.
-			}
+			moves := iterativeAllButL5C(start, lastFace)
+			channel <- append(f2l1Solution, moves...)
 		}
 	}()
 	return channel
 }
 
 func iterativeAllButL5C(start gocube.CubieCube, lastFace int) []gocube.Move {
-	for depth := 0; depth < 7; depth++ {
+	for depth := 0; true; depth++ {
 		if solution := solveAllButL5C(start, depth, lastFace); solution != nil {
 			return solution
 		}
@@ -60,6 +65,8 @@ func solveAllButL5C(start gocube.CubieCube, depth, lastFace int) []gocube.Move {
 		} else {
 			return nil
 		}
+	} else if globalEdgesHeuristic.Lookup(start.Edges) > depth {
+		return nil
 	}
 	for m := 0; m < 18; m++ {
 		move := gocube.Move(m)
