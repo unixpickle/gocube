@@ -3,6 +3,7 @@ package fmc
 import "github.com/unixpickle/gocube"
 
 var globalEdgesHeuristic *EdgesHeuristic
+
 const globalEdgesHeuristicDepth = 5
 
 // IsAllButL5CSolved returns true if the cube is almost solved (having up to 5
