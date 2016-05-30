@@ -24,11 +24,12 @@ func TestStickerCubeRotate(t *testing.T) {
 	}
 	stickers := cube.StickerCube()
 
-	rotations := []string{"x", "y", "z'"}
+	rotations := []string{"x", "y", "z'", "x2"}
 	outcomes := []string{
 		"ROOOGYGYY WYGYBGYGW YRRBYRROW BGYWWWORB GBWWRORWG BBOBOROGB",
 		"YWBGWRBWO RRWRYOYBR WOGBRWGWR OBBGOBBRO WGYGBYGYW ROOOGYGYY",
 		"GWRORWWBG BBOBOROGB OYYOGYROG GGWYBGWYY RRWRYOYBR OWBRWGBWY",
+		"YRRBYRROW BROWWWYGB WYGYBGYGW YYGYGOOOR RWGWRBGOW ORBBOGBBO",
 	}
 	for i, s := range rotations {
 		rot, _ := ParseRotation(s)
