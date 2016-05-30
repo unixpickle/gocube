@@ -36,14 +36,14 @@ func (r Rotation) Axis() int {
 // This is 1 for regular rotations, -1 for inverse
 // rotations, and 2 for double rotations.
 func (r Rotation) Turns() int {
-	return int(r) / 3
+	return [3]int{1, -1, 2}[int(r)/3]
 }
 
 // String returns the string representation
 // of this rotation, in WCA notation.
 func (r Rotation) String() string {
 	axisStr := []string{"x", "y", "z"}[r.Axis()]
-	turnsStr := []string{"", "'", "2"}[r.Turns()]
+	turnsStr := map[int]string{-1: "'", 1: "", 2: "2"}[r.Turns()]
 	return axisStr + turnsStr
 }
 

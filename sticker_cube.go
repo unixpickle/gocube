@@ -7,6 +7,56 @@ import (
 	"strings"
 )
 
+// XRotationPerm stores sticker indices for the
+// faces involved in an "x" rotation.
+//
+// The first four sets of 9 stickers are for the
+// four faces which are not normal to the x-axis.
+// Each set of 9 consecutive stickers corresponds
+// to a face, such that the stickers indexed by
+// the first face are moved to the indices of the
+// second face, and those to the third face, etc.
+//
+// The two normal faces are represented by two 8-perms
+// at the end of the list.
+// These 8-perms are applied twice to permutate the
+// non-center pieces of the normal faces.
+// The sticker at the first index of the 8-perm is moved
+// to the next index, etc.
+var XRotationPerm = []int{
+	0, 1, 2, 3, 4, 5, 6, 7, 8,
+	35, 34, 33, 32, 31, 30, 29, 28, 27,
+	9, 10, 11, 12, 13, 14, 15, 16, 17,
+	18, 19, 20, 21, 22, 23, 24, 25, 26,
+
+	36, 37, 38, 41, 44, 43, 42, 39,
+	47, 46, 45, 48, 51, 52, 53, 50,
+}
+
+// YRotationPerm is like XRotationPerm, but for
+// "y" rotations.
+var YRotationPerm = []int{
+	18, 19, 20, 21, 22, 23, 24, 25, 26,
+	45, 46, 47, 48, 49, 50, 51, 52, 53,
+	27, 28, 29, 30, 31, 32, 33, 34, 35,
+	36, 37, 38, 39, 40, 41, 42, 43, 44,
+
+	0, 1, 2, 5, 8, 7, 6, 3,
+	11, 10, 9, 12, 15, 16, 17, 14,
+}
+
+// ZRotationPerm is like XRotationPerm, but for
+// "z" rotations.
+var ZRotationPerm = []int{
+	51, 48, 45, 52, 49, 46, 53, 50, 47,
+	0, 1, 2, 3, 4, 5, 6, 7, 8,
+	38, 41, 44, 37, 40, 43, 36, 39, 42,
+	17, 16, 15, 14, 13, 12, 11, 10, 9,
+
+	18, 19, 20, 23, 26, 25, 24, 21,
+	29, 28, 27, 30, 33, 34, 35, 32,
+}
+
 // A StickerCube is simply a list of 54 stickers.
 //
 // Each sticker is a number between 1 and 6. Here is a mapping for a standard
@@ -124,6 +174,70 @@ func (s *StickerCube) String() string {
 		res += strs[num : num+1]
 	}
 	return res
+}
+
+// Rotate applies a rotation to the stickers.
+// It moves the centers as well, so it might be
+// necessary to call s.ReinterpretCenters() before
+// converting s to a CubieCube.
+func (s *StickerCube) Rotate(r Rotation) {
+	var applyCount int
+	var perm []int
+	switch r.Turns() {
+	case 1:
+		applyCount = 1
+	case 2:
+		applyCount = 2
+	case -1:
+		applyCount = 3
+	}
+	switch r.Axis() {
+	case 0:
+		perm = XRotationPerm
+	case 1:
+		perm = YRotationPerm
+	case 2:
+		perm = ZRotationPerm
+	}
+
+	for j := 0; j < applyCount; j++ {
+		for i := 0; i < 9; i++ {
+			indexes := [4]int{perm[i], perm[i+9], perm[i+18], perm[i+27]}
+			s[indexes[0]], s[indexes[1]], s[indexes[2]], s[indexes[3]] =
+				s[indexes[3]], s[indexes[0]], s[indexes[1]], s[indexes[2]]
+		}
+		for k := 0; k < 2; k++ {
+			listIdx := 4*9 + k*8
+			for l := 0; l < 2; l++ {
+				temp := s[perm[listIdx+7]]
+				for i := 7; i > 0; i-- {
+					idx := perm[listIdx+i]
+					lastIdx := perm[listIdx+i-1]
+					s[idx] = s[lastIdx]
+				}
+				s[perm[listIdx]] = temp
+			}
+		}
+	}
+}
+
+// ReinterpretCenters changes the meaning of different
+// stickers so that the cube is oriented with 1 on top,
+// 3 in front.
+// In other words, it recolors the cube to be in the
+// standard color scheme.
+func (s *StickerCube) ReinterpretCenters() {
+	colorMap := map[int]int{
+		s[4]:    1,
+		s[9+4]:  2,
+		s[18+4]: 3,
+		s[27+4]: 4,
+		s[36+4]: 5,
+		s[45+4]: 6,
+	}
+	for i, x := range s {
+		s[i] = colorMap[x]
+	}
 }
 
 func parseFace(str string, fill int) ([]int, error) {
