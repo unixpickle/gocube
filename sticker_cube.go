@@ -51,7 +51,6 @@ func InputStickerCube() (*StickerCube, error) {
 	fmt.Println("For each face, enter what you see from left to right, top to")
 	fmt.Println("bottom like reading a book.")
 
-	// These are the six prompts (one for each side)
 	prompts := []string{
 		"   Top face [x']: ",
 		"Bottom face [x2]: ",
@@ -61,7 +60,6 @@ func InputStickerCube() (*StickerCube, error) {
 		"  Left face [y2]: ",
 	}
 
-	// Print each prompt and read each face.
 	var res StickerCube
 	for i, prompt := range prompts {
 		fmt.Print(prompt)
@@ -73,7 +71,6 @@ func InputStickerCube() (*StickerCube, error) {
 		copy(res[startIdx:startIdx+9], face)
 	}
 
-	// Validate the result
 	counts := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 	for _, sticker := range res {
 		counts[sticker]++
@@ -165,7 +162,6 @@ func parseFace(str string, fill int) ([]int, error) {
 }
 
 func readFace(number int) ([]int, error) {
-	// Read the line
 	var line string
 	if _, err := fmt.Scanln(&line); err != nil {
 		return nil, err
