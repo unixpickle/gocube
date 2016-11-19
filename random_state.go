@@ -4,28 +4,25 @@ import (
 	"math/rand"
 )
 
+// RandomCubieCube generates a random state.
 func RandomCubieCube() CubieCube {
 	var res CubieCube
 
-	// Generate a random permutation for the corners.
 	pieces := rand.Perm(8)
 	for i, x := range pieces {
 		res.Corners[i].Piece = x
 	}
 
-	// Generate a random permutation for the edges.
 	cornerParity := parity(pieces)
 	pieces = rand.Perm(12)
 	for i, x := range pieces {
 		res.Edges[i].Piece = x
 	}
 
-	// Make sure the overall parity is even.
 	if cornerParity != parity(pieces) {
 		res.Edges[11], res.Edges[10] = res.Edges[10], res.Edges[11]
 	}
 
-	// Generate edge orientations.
 	lastFlip := false
 	for i := 0; i < 11; i++ {
 		if rand.Intn(2) == 0 {
@@ -35,7 +32,6 @@ func RandomCubieCube() CubieCube {
 	}
 	res.Edges[11].Flip = lastFlip
 
-	// Generate the corner orientations.
 	for i := 0; i < 7; i++ {
 		res.Corners[i].Orientation = rand.Intn(3)
 	}
@@ -59,6 +55,64 @@ func RandomCubieCube() CubieCube {
 	}
 
 	return res
+}
+
+// RandomZBLL generates a cube with a random last layer
+// in which the edges are all properly oriented.
+func RandomZBLL() CubieCube {
+	res := SolvedCubieCube()
+	var cornerParity bool
+	res.Corners, cornerParity = RandomLLCorners()
+
+	edgePerm := rand.Perm(4)
+	if parity(edgePerm) != cornerParity {
+		edgePerm[0], edgePerm[1] = edgePerm[1], edgePerm[0]
+	}
+
+	topEdges := []int{0, 4, 5, 6}
+	for i, j := range edgePerm {
+		res.Edges[topEdges[i]].Piece = topEdges[j]
+	}
+
+	return res
+}
+
+// RandomLLCorners generates random last-layer corners
+// and returns the corners as well as their parity.
+//
+// A parity of true is even, while false is odd.
+func RandomLLCorners() (CubieCorners, bool) {
+	orientations := make([]int, 4)
+	for i := 0; i < 3; i++ {
+		orientations[i] = rand.Intn(3)
+	}
+
+	o := append([]int{}, orientations...)
+	for i := 0; i < 3; i++ {
+		this := o[i]
+		next := o[i+1]
+		if this == 2 {
+			o[i+1] = (next + 2) % 3
+		} else {
+			o[i+1] = (next + 1) % 3
+		}
+	}
+	if o[3] == 0 {
+		orientations[3] = 2
+	} else if o[3] == 2 {
+		orientations[3] = 0
+	} else {
+		orientations[3] = 1
+	}
+
+	cube := SolvedCubieCorners()
+	perm := rand.Perm(4)
+	pieces := []int{2, 3, 7, 6}
+	for i, piece := range pieces {
+		cube[piece].Orientation = orientations[i]
+		cube[piece].Piece = pieces[perm[i]]
+	}
+	return cube, parity(perm)
 }
 
 // parity returns true if the parity is even.
