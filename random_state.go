@@ -1,8 +1,6 @@
 package gocube
 
-import (
-	"math/rand"
-)
+import "math/rand"
 
 // RandomCubieCube generates a random state.
 func RandomCubieCube() CubieCube {
@@ -65,7 +63,7 @@ func RandomZBLL() CubieCube {
 	res.Corners, cornerParity = RandomLLCorners()
 
 	edgePerm := rand.Perm(4)
-	if parity(edgePerm) != cornerParity {
+	if parity(append([]int{}, edgePerm...)) != cornerParity {
 		edgePerm[0], edgePerm[1] = edgePerm[1], edgePerm[0]
 	}
 
