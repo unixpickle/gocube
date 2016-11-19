@@ -290,9 +290,9 @@ func encodeZCornerPerm(c *CubieCorners) int {
 func moveUDEdgePerm(perm []int, move Phase2Move) int {
 	var newPerm [8]int
 	copy(newPerm[:], perm)
-	
+
 	// The moves are F2, B2, R2, L2, U, U', U2, D, D', D2.
-	switch (move) {
+	switch move {
 	case 0:
 		newPerm[2], newPerm[6] = newPerm[6], newPerm[2]
 	case 1:
@@ -320,16 +320,16 @@ func moveUDEdgePerm(perm []int, move Phase2Move) int {
 		newPerm[4], newPerm[6] = newPerm[6], newPerm[4]
 		newPerm[5], newPerm[7] = newPerm[7], newPerm[5]
 	}
-	
+
 	return encodePermutationInPlace(newPerm[:])
 }
 
 func moveYCornerPerm(perm []int, move Phase2Move) int {
 	var p [8]int
 	copy(p[:], perm)
-	
+
 	// The moves are F2, B2, R2, L2, U, U', U2, D, D', D2.
-	switch (move) {
+	switch move {
 	case 0:
 		p[5], p[6] = p[6], p[5]
 		p[4], p[7] = p[7], p[4]
@@ -357,6 +357,6 @@ func moveYCornerPerm(perm []int, move Phase2Move) int {
 		p[0], p[5] = p[5], p[0]
 		p[1], p[4] = p[4], p[1]
 	}
-	
+
 	return encodePermutationInPlace(p[:])
 }

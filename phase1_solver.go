@@ -23,7 +23,7 @@ func NewPhase1Heuristic(moves *Phase1Moves) *Phase1Heuristic {
 // phase-1 axis.
 func (p *Phase1Heuristic) LowerBound(c *Phase1Cube) int {
 	finalResult := uint8(127)
-	
+
 	coEOValues := []int{
 		c.XCornerOrientation*2048 + c.XEdgeOrientation(),
 		c.YCornerOrientation*2048 + c.FBEdgeOrientation,
@@ -52,7 +52,7 @@ func (p *Phase1Heuristic) computeCOEO(moves *Phase1Moves) {
 	for i := 0; i < 4478976; i++ {
 		p.COEO[i] = 8
 	}
-	
+
 	nodes := []phase1COEONode{phase1COEONode{1093, 0, 0}}
 	visited := make([]bool, 4478976)
 	for len(nodes) > 0 {
@@ -63,11 +63,11 @@ func (p *Phase1Heuristic) computeCOEO(moves *Phase1Moves) {
 			continue
 		}
 		p.COEO[hash] = node.depth
-		
+
 		if node.depth == 7 {
 			continue
 		}
-		
+
 		for move := 0; move < 18; move++ {
 			newCO := moves.COMoves[node.co][move]
 			newEO := moves.EOMoves[node.eo][move]

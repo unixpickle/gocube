@@ -63,7 +63,7 @@ OuterLoop:
 			s.Stop()
 			break
 		}
-		
+
 		// Generate the cube after solving phase1.
 		cube := c
 		for _, m := range p1Solution.Moves {
