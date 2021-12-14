@@ -33,24 +33,7 @@ func RandomCubieCube() CubieCube {
 	for i := 0; i < 7; i++ {
 		res.Corners[i].Orientation = rand.Intn(3)
 	}
-	var orientations [8]int
-	for i, x := range []int{0, 1, 5, 4, 6, 2, 3, 7} {
-		orientations[i] = res.Corners[x].Orientation
-	}
-	for i := 0; i < 7; i++ {
-		thisOrientation := orientations[i]
-		nextOrientation := orientations[i+1]
-		if thisOrientation == 2 {
-			orientations[i+1] = (nextOrientation + 2) % 3
-		} else if thisOrientation == 0 {
-			orientations[i+1] = (nextOrientation + 1) % 3
-		}
-	}
-	if orientations[7] == 0 {
-		res.Corners[7].Orientation = 2
-	} else if orientations[7] == 2 {
-		res.Corners[7].Orientation = 0
-	}
+	res.Corners.fixLastOrientation()
 
 	return res
 }

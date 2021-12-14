@@ -170,3 +170,34 @@ func (c *CubieCorners) Solved() bool {
 	}
 	return true
 }
+
+// fixLastOrientation orients the final corner (corner 7),
+// assuming all of the other corners are correct.
+func (c *CubieCorners) fixLastOrientation() {
+	// Start by orienting the final corner upright. Then, solve a series of
+	// adjacent corners in order, twisting the next corner in the opposite
+	// direction to preserve orientation. The resulting orientation of the
+	// final corner tells us the inverse of what the orientation should have
+	// been.
+
+	c[7].Orientation = 1
+
+	var orientations [8]int
+	for i, x := range []int{0, 1, 5, 4, 6, 2, 3, 7} {
+		orientations[i] = c[x].Orientation
+	}
+	for i := 0; i < 7; i++ {
+		thisOrientation := orientations[i]
+		nextOrientation := orientations[i+1]
+		if thisOrientation == 2 {
+			orientations[i+1] = (nextOrientation + 2) % 3
+		} else if thisOrientation == 0 {
+			orientations[i+1] = (nextOrientation + 1) % 3
+		}
+	}
+	if orientations[7] == 0 {
+		c[7].Orientation = 2
+	} else if orientations[7] == 2 {
+		c[7].Orientation = 0
+	}
+}
