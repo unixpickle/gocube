@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/unixpickle/gocube"
 	"github.com/unixpickle/gocube/fmc"
-	"os"
 )
 
 func main() {

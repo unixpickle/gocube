@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/unixpickle/gocube"
 	"os"
 	"strconv"
+
+	"github.com/unixpickle/gocube"
 )
 
 func main() {
@@ -30,7 +31,12 @@ func main() {
 	p1Heuristic := gocube.NewPhase1Heuristic(p1Moves)
 	p2Moves := gocube.NewPhase2Moves()
 	p2Heuristic := gocube.NewPhase2Heuristic(p2Moves, false)
-	tables := gocube.SolverTables{p1Heuristic, p1Moves, p2Heuristic, p2Moves}
+	tables := gocube.SolverTables{
+		P1Heuristic: p1Heuristic,
+		P1Moves:     p1Moves,
+		P2Heuristic: p2Heuristic,
+		P2Moves:     p2Moves,
+	}
 	for i := 0; i < count; i++ {
 		state := gocube.RandomCubieCube()
 		solver := gocube.NewSolverTables(state, maxLen, tables)

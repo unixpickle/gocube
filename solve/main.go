@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/unixpickle/gocube"
 	"os"
+
+	"github.com/unixpickle/gocube"
 )
 
 func main() {
-	// Get input.
 	sc, err := gocube.InputStickerCube()
 	if err != nil {
 		fmt.Println("Failed to read stickers:", err)

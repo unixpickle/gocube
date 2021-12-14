@@ -44,9 +44,9 @@ func TestNewPhase2Cube(t *testing.T) {
 	}
 	axes := []int{1, 0, 2}
 	states := []Phase2Cube{
-		Phase2Cube{29024, 14092, 2},
-		Phase2Cube{29024, 14092, 2},
-		Phase2Cube{29024, 14092, 2},
+		{29024, 14092, 2},
+		{29024, 14092, 2},
+		{29024, 14092, 2},
 	}
 
 	for i, s := range scrambles {

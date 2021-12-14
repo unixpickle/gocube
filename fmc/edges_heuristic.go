@@ -12,8 +12,9 @@ type EdgesHeuristic struct {
 // depth.
 func NewEdgesHeuristic(maxDepth int) EdgesHeuristic {
 	res := EdgesHeuristic{map[string]int{}, maxDepth}
-	queue := []EdgesHeuristicNode{EdgesHeuristicNode{gocube.SolvedCubieEdges(),
-		HashEdges(gocube.SolvedCubieEdges()), 0}}
+	queue := []EdgesHeuristicNode{
+		{gocube.SolvedCubieEdges(), HashEdges(gocube.SolvedCubieEdges()), 0},
+	}
 	for len(queue) > 0 {
 		node := queue[0]
 		queue = queue[1:]

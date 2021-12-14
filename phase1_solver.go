@@ -53,7 +53,7 @@ func (p *Phase1Heuristic) computeCOEO(moves *Phase1Moves) {
 		p.COEO[i] = 8
 	}
 
-	nodes := []phase1COEONode{phase1COEONode{1093, 0, 0}}
+	nodes := []phase1COEONode{{1093, 0, 0}}
 	visited := make([]bool, 4478976)
 	for len(nodes) > 0 {
 		node := nodes[0]
@@ -85,7 +85,7 @@ func (p *Phase1Heuristic) computeEOSlice(moves *Phase1Moves) {
 	for i := 0; i < 1013760; i++ {
 		p.EOSlice[i] = 8
 	}
-	nodes := []phase1EOSliceNode{phase1EOSliceNode{0, 220, 0}}
+	nodes := []phase1EOSliceNode{{0, 220, 0}}
 	visited := make([]bool, 1013760)
 	for len(nodes) > 0 {
 		node := nodes[0]

@@ -23,7 +23,7 @@ func NewPhase2Heuristic(moves *Phase2Moves, complete bool) *Phase2Heuristic {
 	}
 
 	// Generate CornersSlice
-	nodes := []phase2Node{phase2Node{0, 0, 0}}
+	nodes := []phase2Node{{0, 0, 0}}
 	visited := make([]bool, 967680)
 	for len(nodes) > 0 {
 		node := nodes[0]
@@ -49,7 +49,7 @@ func NewPhase2Heuristic(moves *Phase2Moves, complete bool) *Phase2Heuristic {
 	}
 
 	// Generate EdgesSlice
-	nodes = []phase2Node{phase2Node{0, 0, 0}}
+	nodes = []phase2Node{{0, 0, 0}}
 	visited = make([]bool, 967680)
 	for len(nodes) > 0 {
 		node := nodes[0]
