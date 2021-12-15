@@ -1,6 +1,7 @@
 package gocube
 
 import (
+	"math/rand"
 	"testing"
 )
 
@@ -36,6 +37,30 @@ func TestCubieCorners(t *testing.T) {
 	for i, corner := range corners {
 		if corner.Orientation != orientations[i] {
 			t.Error("Invalid orientation at", i)
+		}
+	}
+}
+
+func TestCubieCornersFixLastOrientation(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		// Create a random set of orientations.
+		state := SolvedCubieCorners()
+		for i := 0; i < 8; i++ {
+			state[i].Orientation = rand.Intn(3)
+		}
+		state.fixLastOrientation()
+
+		// Make sure that applying random moves doesn't
+		// change what we believe is a correct orientation.
+		for j := 0; j < 100; j++ {
+			move := Move(rand.Intn(6 * 3))
+			state.Move(move)
+			s1 := state
+			s1.fixLastOrientation()
+			if s1 != state {
+				t.Errorf("at move %d (%v), corners appear not to be oriented", j, move)
+				break
+			}
 		}
 	}
 }

@@ -103,3 +103,25 @@ func TestStickerToCube(t *testing.T) {
 		}
 	}
 }
+
+func TestStickerCubieCycleConsistency(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		cubieCube := RandomCubieCube()
+		stickerCube := cubieCube.StickerCube()
+		stickerStr := stickerCube.String()
+		stickerCube1, err := ParseStickerCube(stickerStr)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if *stickerCube1 != stickerCube {
+			t.Fatalf("sticker cube parse failed: %v", stickerCube.String())
+		}
+		cubieCube1, err := stickerCube1.CubieCube()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if *cubieCube1 != cubieCube {
+			t.Fatalf("cubie cube parse failed: %v", stickerCube.String())
+		}
+	}
+}
