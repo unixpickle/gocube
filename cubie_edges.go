@@ -123,3 +123,36 @@ func (c *CubieEdges) Solved() bool {
 	}
 	return true
 }
+
+// EncodeIndex encodes the state of the edges into an integer.
+//
+// If includeParity is true, then the state space is twice as large and
+// includes the parity of the edge permutation. Otherwise, the edge parity is
+// not included in the resulting index.
+//
+// The resulting range is [0, 2^11 * 12!) if includeParity is true, and
+// [0, 2^11 * 12!/2) otherwise.
+//
+// This assumes that the edge orientation is valid.
+func (c *CubieEdges) EncodeIndex(includeParity bool) uint64 {
+	var result uint64
+	for i, piece := range c[:11] {
+		if piece.Flip {
+			result |= 1 << uint(i)
+		}
+	}
+
+	perm := make([]int, 12)
+	for i, piece := range c {
+		perm[i] = piece.Piece
+	}
+
+	var permEncoded int
+	if includeParity {
+		permEncoded = encodePermutationInPlace(perm)
+	} else {
+		permEncoded = encodePermutationNoParityInPlace(perm)
+	}
+
+	return result + uint64(permEncoded)*2048
+}

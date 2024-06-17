@@ -171,6 +171,27 @@ func (c *CubieCorners) Solved() bool {
 	return true
 }
 
+// EncodeIndex encodes the state of the corners as a unique integer in the
+// range [0, 3^7 * 8!).
+//
+// This assumes that the corner orientation is valid.
+func (c *CubieCorners) EncodeIndex() uint32 {
+	var result uint32
+
+	base := uint32(1)
+	for _, corner := range c[:7] {
+		result += base * uint32(corner.Orientation)
+		base *= 3
+	}
+	perm := make([]int, 8)
+	for i, corner := range c {
+		perm[i] = corner.Piece
+	}
+	result += uint32(encodePermutationInPlace(perm)) * base
+
+	return result
+}
+
 // fixLastOrientation orients the final corner (corner 7),
 // assuming all of the other corners are correct.
 func (c *CubieCorners) fixLastOrientation() {
