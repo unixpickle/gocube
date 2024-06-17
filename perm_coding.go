@@ -125,6 +125,39 @@ func encodePermutationInPlace(perm []int) int {
 	return result
 }
 
+func encodePermutationNoParity(perm []int) int {
+	c := make([]int, len(perm))
+	copy(c, perm)
+	return encodePermutationNoParityInPlace(c)
+}
+
+func encodePermutationNoParityInPlace(perm []int) int {
+	if len(perm) == 0 {
+		return 0
+	}
+
+	count := len(perm) - 1
+	result := 0
+	factorial := factorial(count) / 2
+
+	for i := 0; i < count-1; i++ {
+		current := perm[i]
+
+		// Add the element to the result.
+		result += factorial * current
+		factorial /= count - i
+
+		// Shift all the elements which were above the current element.
+		for j := i + 1; j < count; j++ {
+			if perm[j] > current {
+				perm[j]--
+			}
+		}
+	}
+
+	return result
+}
+
 func factorial(n int) int {
 	if n >= len(factorials) {
 		return n * factorial(n-1)

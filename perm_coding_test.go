@@ -1,6 +1,8 @@
 package gocube
 
-import "testing"
+import (
+	"testing"
+)
 
 func BenchmarkAllPermutations8(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -50,4 +52,43 @@ func TestEncodePermutation(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestEncodePermutationNoParity(t *testing.T) {
+	for length := 0; length < 8; length++ {
+		for _, parity := range []bool{false, true} {
+			testSet := allPermutationsOfParity(length, parity)
+			for j := 0; j < len(testSet); j++ {
+				if j != encodePermutationNoParity(testSet[j]) {
+					t.Error("Encoded", testSet[j], "expected",
+						j, "but got", encodePermutation(testSet[j]))
+				}
+			}
+		}
+	}
+}
+
+func allPermutationsOfParity(size int, parity bool) [][]int {
+	result := [][]int{}
+	for _, perm := range allPermutations(size) {
+		if permutationParity(perm) == parity {
+			result = append(result, perm)
+		}
+	}
+	return result
+}
+
+func permutationParity(seqIn []int) bool {
+	seq := append([]int{}, seqIn...)
+	result := false
+	for i := range seq {
+		for j := i + 1; j < len(seq); j++ {
+			if seq[j] == i {
+				seq[j] = seq[i]
+				seq[i] = i
+				result = !result
+			}
+		}
+	}
+	return result
 }
